@@ -1,0 +1,43 @@
+export function pickRandom(arr: any[]) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Curated seeds to quickly try prompts without typing
+export const THEMES = [
+    'Living room',
+    'Kitchen',
+    'Bedroom',
+    'Bathroom',
+    'Dining room',
+    'Home office',
+    'Nursery',
+    'Laundry room',
+    'Basement media room',
+    'Sunroom'
+];
+
+export const DESCRIPTIONS = [
+    'Scandinavian minimalism — white plaster walls, light oak floors, neutral linen textiles, greenery accents, diffused daylight through large windows, soft shadows, uncluttered surfaces, balanced asymmetry, natural color palette, ~35–50mm lens feel.',
+    'Mid-century modern — walnut casegoods, tapered legs, low-slung boucle seating, geometric patterns, brass accents, warm tungsten practicals, subtle rim light, crisp lines, saturated yet restrained colors, ~45mm camera perspective.',
+    'Japandi — low furniture silhouettes, tatami and raw oak textures, blackened wood contrast, wabi-sabi ceramics, shoji-like translucency, indirect layered lighting, serene negative space, calm earth tones, shallow depth of field.',
+    'Industrial loft — exposed brick and steel beams, black metal framing, concrete floors, oversized factory windows with hard sunlight and gentle volumetric dust, large woven rugs, high contrast, wide but distortion-free framing.',
+    'Contemporary luxury — honed marble and fluted panels, muted neutrals, concealed LED coves, polished metal accents, plush textures, symmetrical composition, pristine reflections, high dynamic range, editorial cleanliness.',
+    'Bohemian eclectic — layered vintage rugs, rattan and cane furniture, patterned textiles, abundant plants, collected artifacts on open shelves, warm golden-hour light, rich yet harmonious colors, lived-in patina, artful asymmetry.',
+    'Modern farmhouse — painted shiplap, natural oak, matte black hardware, apron-front sink details and woven baskets vibes, diffused daylight, cozy knitted throws, creamy whites, subtle wear, welcoming, centered composition.',
+    'Coastal airy — linen slipcovers, driftwood accents, woven jute, light oak, sea-glass blues and sandy neutrals, sheer curtains moving with breeze, bright soft lighting, generous negative space, relaxed beachside palette.',
+    'Art Deco glamour — geometric patterns in gold and black, polished marble surfaces, mirrored panels reflecting warm amber light, velvet upholstery in jewel tones, sunburst motifs, dramatic shadows, luxurious metallic accents, theatrical lighting.',
+    'French Provincial elegance — distressed painted furniture, toile fabrics, wrought iron details, limestone floors, soft cream and sage palette, antique brass fixtures, romantic florals, weathered wood beams, gentle morning light filtering through lace.',
+    'Maximalist paradise — bold wallpapers, clashing patterns that somehow harmonize, vintage collections displayed proudly, rich saturated colors, layered lighting from chandeliers to table lamps, ornate mirrors, eclectic art gallery walls, organized chaos.',
+    'Brutalist concrete — raw exposed concrete walls, geometric angular furniture, minimal color palette of grays and blacks, dramatic directional lighting creating stark shadows, industrial materials, monolithic forms, architectural photography aesthetic.',
+    'Victorian opulence — dark mahogany woodwork, plush velvet drapery, ornate carved details, Persian rugs over hardwood, crystal chandeliers casting prismatic light, rich burgundy and forest green, gilded frames, sumptuous textures.',
+    'Mediterranean warmth — terracotta tiles, wrought iron accents, exposed wooden beams, warm ochre and sienna walls, abundant ceramics and pottery, natural stone details, golden hour lighting, rustic textures, courtyard garden views.',
+    'Retro 70s revival — burnt orange shag carpeting, curved furniture silhouettes, wood paneling, macrame wall hangings, earth tone palette, warm incandescent lighting, vintage brass fixtures, conversation pit seating, nostalgic atmosphere.',
+    'Zen minimalism — clean lines, natural materials only, neutral stone and wood tones, soft diffused lighting, meditation cushions, bonsai trees, water features, negative space as design element, tranquil monastery-like serenity.',
+    'Gothic revival — pointed arch details, rich dark woods, stained glass windows casting colorful light, ornate metalwork, deep jewel tones, heavy drapery, cathedral ceiling elements, dramatic chiaroscuro lighting, medieval inspiration.',
+    'Tropical modernism — natural ventilation design, lush indoor plants, bamboo and teak materials, woven textures, earth tones with tropical accent colors, louvered windows, ceiling fans, outdoor-indoor living flow, humid climate adaptation.',
+    'Soviet brutalism — stark concrete surfaces, functional geometric furniture, minimal decoration, harsh fluorescent lighting, muted industrial colors, utilitarian design philosophy, raw unfinished materials, socialist realist aesthetic influence.',
+    'Memphis design revival — bold geometric shapes, bright primary colors, plastic laminates, unconventional forms, playful postmodern elements, neon lighting accents, graphic patterns, 1980s nostalgia, anti-functional artistic furniture.',
+    'Wabi-sabi imperfection — aged natural materials showing wear, asymmetrical arrangements, muted earth tones, imperfect ceramics, weathered wood surfaces, soft natural lighting, embracing flaws as beauty, rustic Japanese philosophy.',
+    'Cyberpunk futurism — neon LED strip lighting, chrome and glass surfaces, holographic displays, dark moody atmosphere with electric color accents, high-tech furniture, metallic finishes, urban dystopian aesthetic, blade runner vibes.',
+    'Prairie school organic — horizontal lines echoing landscape, natural material integration, built-in furniture, earth tone palette, large overhanging eaves, art glass windows, Frank Lloyd Wright influence, harmony with nature.'
+];

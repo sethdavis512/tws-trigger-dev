@@ -1,4 +1,4 @@
-# Welcome to React Router!
+# Welcome to React Router
 
 A modern, production-ready template for building full-stack React applications using React Router.
 
@@ -81,6 +81,23 @@ Make sure to deploy the output of `npm run build`
 ## Styling
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+
+## Trigger.dev: Generate image with DALL·E 3
+
+This repo includes a Trigger.dev task at `trigger/generateContent.ts` that uses OpenAI GPT-4o to write a caption and DALL·E 3 to generate an image.
+
+- Requires `OPENAI_API_KEY` in your environment.
+- Task id: `generate-content`
+- Example payload:
+
+```json
+{
+  "theme": "A beautiful sunset",
+  "description": "A sunset over the ocean with a tiny yacht in the distance."
+}
+```
+
+Run locally with your normal dev flow; trigger the task from the Trigger.dev dashboard or any integration you use. The task returns the generated caption and either a hosted image URL or base64 content.
 
 ---
 

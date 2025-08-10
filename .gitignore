@@ -6,3 +6,8 @@
 /build/
 
 .trigger
+.env
+/generated/prisma
+
+# Cache files
+/cache/

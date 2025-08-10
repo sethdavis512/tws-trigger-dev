@@ -1,0 +1,107 @@
+// prisma/schema.prisma
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String   @id @default(cuid())
+    name          String?
+    email         String   @unique
+    emailVerified Boolean  @default(false)
+    image         String?
+    credits       Int      @default(10)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    // BetterAuth relationships
+    accounts Account[]
+    sessions Session[]
+
+    prompts Prompt[]
+    images  Image[]
+
+    @@map("users")
+}
+
+model Account {
+    id                    String    @id @default(cuid())
+    accountId             String
+    providerId            String
+    userId                String
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([providerId, accountId])
+    @@map("accounts")
+}
+
+model Session {
+    id        String   @id @default(cuid())
+    expiresAt DateTime
+    token     String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    ipAddress String?
+    userAgent String?
+    userId    String
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("sessions")
+}
+
+model Verification {
+    id         String   @id @default(cuid())
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@unique([identifier, value])
+    @@map("verifications")
+}
+
+model Prompt {
+    id          String   @id @default(cuid())
+    theme       String
+    description String
+    createdAt   DateTime @default(now())
+
+    userId String
+    user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    images Image[]
+
+    @@map("prompts")
+}
+
+model Image {
+    id        String   @id @default(cuid())
+    url       String
+    base64    String?
+    runId     String?
+    size      String?
+    createdAt DateTime @default(now())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    promptId String?
+    prompt   Prompt? @relation(fields: [promptId], references: [id], onDelete: SetNull)
+
+    @@map("images")
+}
