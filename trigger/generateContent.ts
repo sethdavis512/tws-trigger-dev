@@ -1,10 +1,18 @@
 import { task, logger } from '@trigger.dev/sdk/v3';
 import OpenAI from 'openai';
+import { v2 as cloudinary } from 'cloudinary';
 import type { ImageGenerateParamsBase } from 'openai/resources/images.mjs';
 import { createImage } from '~/models/image.server';
 import { createPrompt } from '~/models/prompt.server';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 type Payload = {
     theme: string;
@@ -78,9 +86,44 @@ export const generateContent = task({
             hasBase64: !!imageBase64
         });
 
-        // Save the prompt and generated image to database
+        // Upload to Cloudinary if we have image data
+        let cloudinaryUrl: string | null = null;
+        let cloudinaryPublicId: string | null = null;
+
+        if (imageUrl || imageBase64) {
+            try {
+                const uploadSource = imageUrl || `data:image/png;base64,${imageBase64}`;
+                
+                const cloudinaryResult = await cloudinary.uploader.upload(uploadSource, {
+                    resource_type: 'image',
+                    folder: 'rapidalle/generated',
+                    use_filename: false,
+                    unique_filename: true,
+                    transformation: [
+                        { quality: 'auto', fetch_format: 'auto' }
+                    ]
+                });
+
+                cloudinaryUrl = cloudinaryResult.secure_url;
+                cloudinaryPublicId = cloudinaryResult.public_id;
+
+                logger.log('Image uploaded to Cloudinary', {
+                    url: cloudinaryUrl,
+                    publicId: cloudinaryPublicId,
+                    runId: ctx.run.id
+                });
+            } catch (error) {
+                logger.warn('Cloudinary upload failed, falling back to original URL', {
+                    error: String(error),
+                    runId: ctx.run.id
+                });
+                // Continue with original URL/base64 if Cloudinary fails
+            }
+        }
+
+                // Save the prompt and generated image to database
         try {
-            if (imageUrl || imageBase64) {
+            if (cloudinaryUrl || imageUrl || imageBase64) {
                 // 1) Persist the prompt so we can link it to the image
                 const prompt = await createPrompt(userId, {
                     theme,
@@ -88,14 +131,22 @@ export const generateContent = task({
                 });
 
                 // 2) Create the image linked to the prompt
+                // Prefer Cloudinary URL, fallback to original URL, then base64
+                const finalImageUrl = cloudinaryUrl || imageUrl || '';
+                
                 await createImage(userId, {
-                    url: imageUrl ?? '',
-                    base64: imageBase64,
+                    url: finalImageUrl,
+                    base64: cloudinaryUrl ? undefined : imageBase64, // Only store base64 if not uploaded to Cloudinary
                     runId: ctx.run.id,
                     size: size ?? undefined,
                     promptId: prompt.id
                 });
-                logger.log('Image saved to database', { runId: ctx.run.id });
+                
+                logger.log('Image saved to database', { 
+                    runId: ctx.run.id,
+                    useCloudinary: !!cloudinaryUrl,
+                    url: finalImageUrl
+                });
             }
         } catch (error) {
             logger.warn('Failed to save image to database', {
@@ -107,8 +158,9 @@ export const generateContent = task({
 
         return {
             text: caption,
-            image: imageUrl ?? null,
-            imageBase64: imageBase64 ?? null
+            image: cloudinaryUrl || imageUrl || null,
+            imageBase64: cloudinaryUrl ? null : (imageBase64 ?? null), // Don't return base64 if we have Cloudinary URL
+            cloudinaryPublicId
         };
     }
 });

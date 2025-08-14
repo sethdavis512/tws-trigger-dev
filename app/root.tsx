@@ -66,26 +66,32 @@ export default function App({ loaderData }: Route.ComponentProps) {
                             <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
                                 RapiDall•E
                             </h1>
-                            {loaderData.user && (
-                                <UserMenu user={loaderData.user} />
-                            )}
+                            <div className="py-4">
+                                {loaderData.user && (
+                                    <UserMenu user={loaderData.user} />
+                                )}
 
-                            {!loaderData.user && (
-                                <div className="flex flex-col space-y-2 mb-6">
-                                    <Link
-                                        to="sign-in"
-                                        className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                                    >
-                                        Sign in
-                                    </Link>
-                                    <Link
-                                        to="sign-up"
-                                        className="bg-indigo-600 text-white px-3 py-2 rounded text-sm hover:bg-indigo-700 text-center"
-                                    >
-                                        Sign up
-                                    </Link>
-                                </div>
-                            )}
+                                {!loaderData.user && (
+                                    <div className="flex flex-col space-y-2 mb-6">
+                                        <Link
+                                            to="sign-in"
+                                            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                        >
+                                            Sign in
+                                        </Link>
+                                        <Link
+                                            to="sign-up"
+                                            className="bg-indigo-600 text-white px-3 py-2 rounded text-sm hover:bg-indigo-700 text-center"
+                                        >
+                                            Sign up
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                            <p className="py-4">
+                                It's a portmanteau of "Rapid" and "DALL·E", a
+                                cutting-edge AI image generation tool.
+                            </p>
                         </div>
                     </aside>
                     <Outlet />
