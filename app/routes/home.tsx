@@ -1,4 +1,4 @@
-import { data, Link } from 'react-router';
+import { data, Link, useRevalidator } from 'react-router';
 import type { Prompt } from '@prisma/client';
 import type { Route } from './+types/home';
 import { useRealtimeRun } from '@trigger.dev/react-hooks';
@@ -150,6 +150,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
     const cardId = useId();
     const fetcher = useFetcher({ key: `dalle-${cardId}` });
+    const revalidator = useRevalidator();
     const handle = fetcher.data;
 
     const accessToken = handle?.publicAccessToken as string | undefined;
@@ -165,6 +166,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         run?.status === 'COMPLETED' ||
         run?.status === 'FAILED' ||
         run?.status === 'CANCELED';
+
+    // Debug logging for run status changes
+    useEffect(() => {
+        if (runId) {
+            console.log('📊 Run status update:', {
+                runId,
+                status,
+                finished,
+                runStatus: run?.status,
+                fetcherState: fetcher.state
+            });
+        }
+    }, [runId, status, finished, run?.status, fetcher.state]);
 
     // Extract any errors from submission (server action) or the run itself
     const submissionError: { message?: string; code?: string } | undefined =
@@ -222,14 +236,29 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
     // Create loading images from active submissions
     const loadingImages = useMemo(() => {
+        const existingRunIds = new Set(
+            images.map((img) => img.runId).filter(Boolean)
+        );
+
         return Array.from(state.submissions.entries())
             .filter(([submissionRunId]) => {
+                // Don't show loading if we already have the completed image
+                if (existingRunIds.has(submissionRunId)) {
+                    return false;
+                }
+
                 // Only show if run is not finished
                 if (submissionRunId === runId) {
                     return !finished;
                 }
-                // For other runs, we don't have status so assume they're still running
-                return true;
+                // For other runs, only show them for a short time (5 minutes max)
+                const submission = state.submissions.get(submissionRunId);
+                if (submission) {
+                    const ageInMinutes =
+                        (Date.now() - submission.submittedAt) / (1000 * 60);
+                    return ageInMinutes < 5; // Remove submissions older than 5 minutes
+                }
+                return false;
             })
             .map(([submissionRunId, submission]) => ({
                 id: `loading-${submissionRunId}`,
@@ -255,6 +284,51 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             return () => clearTimeout(timer);
         }
     }, [finished, runId]);
+
+    // Clean up old submissions that might be stuck
+    useEffect(() => {
+        const cleanupTimer = setInterval(() => {
+            const now = Date.now();
+            Array.from(state.submissions.entries()).forEach(
+                ([submissionRunId, submission]) => {
+                    const ageInMinutes =
+                        (now - submission.submittedAt) / (1000 * 60);
+                    // Remove submissions older than 10 minutes
+                    if (ageInMinutes > 10) {
+                        console.log(
+                            '🧹 Cleaning up old submission:',
+                            submissionRunId
+                        );
+                        dispatch({
+                            type: 'REMOVE_SUBMISSION',
+                            payload: submissionRunId
+                        });
+                    }
+                }
+            );
+        }, 60 * 1000); // Check every minute
+
+        return () => clearInterval(cleanupTimer);
+    }, [state.submissions]);
+
+    // Invalidate cache and revalidate when run completes
+    useEffect(() => {
+        if (finished && runId && run?.status === 'COMPLETED') {
+            console.log(
+                '🎉 Run completed, invalidating cache and revalidating...',
+                { runId, status: run.status }
+            );
+
+            // Clear client cache to force fresh data load
+            const url = new URL(window.location.href);
+            const cacheKey = `home:${url.pathname}:${url.search}`;
+            cache.removeKey(cacheKey);
+            cache.save();
+
+            // Revalidate the route to get fresh data
+            revalidator.revalidate();
+        }
+    }, [finished, runId, run?.status, revalidator]);
 
     // Combine loading images with actual images, loading first
     const allImages = [...loadingImages, ...images];
@@ -514,17 +588,29 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                         </div>
                                     )}
                                     <div className="p-4">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                                                Generating
-                                            </span>
-                                            <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">
-                                                {image.theme}
-                                            </h3>
-                                        </div>
-                                        <p className="text-blue-700 dark:text-blue-300 text-sm">
-                                            {image.description}
-                                        </p>
+                                        <details
+                                            className="mb-3"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <summary className="list-none cursor-pointer select-none">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                                                            Generating
+                                                        </span>
+                                                        <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">
+                                                            {image.theme}
+                                                        </h3>
+                                                    </div>
+                                                    <span className="ml-2 text-xs text-blue-500 dark:text-blue-400 transition-transform">
+                                                        ▾
+                                                    </span>
+                                                </div>
+                                            </summary>
+                                            <p className="text-blue-700 dark:text-blue-300 text-sm mt-2">
+                                                {image.description}
+                                            </p>
+                                        </details>
                                         <div className="mt-2 text-xs text-blue-500 dark:text-blue-400">
                                             Status: {image.status}
                                         </div>

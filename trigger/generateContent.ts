@@ -92,17 +92,21 @@ export const generateContent = task({
 
         if (imageUrl || imageBase64) {
             try {
-                const uploadSource = imageUrl || `data:image/png;base64,${imageBase64}`;
-                
-                const cloudinaryResult = await cloudinary.uploader.upload(uploadSource, {
-                    resource_type: 'image',
-                    folder: 'rapidalle/generated',
-                    use_filename: false,
-                    unique_filename: true,
-                    transformation: [
-                        { quality: 'auto', fetch_format: 'auto' }
-                    ]
-                });
+                const uploadSource =
+                    imageUrl || `data:image/png;base64,${imageBase64}`;
+
+                const cloudinaryResult = await cloudinary.uploader.upload(
+                    uploadSource,
+                    {
+                        resource_type: 'image',
+                        folder: 'rapidalle/generated',
+                        use_filename: false,
+                        unique_filename: true,
+                        transformation: [
+                            { quality: 'auto', fetch_format: 'auto' }
+                        ]
+                    }
+                );
 
                 cloudinaryUrl = cloudinaryResult.secure_url;
                 cloudinaryPublicId = cloudinaryResult.public_id;
@@ -113,15 +117,18 @@ export const generateContent = task({
                     runId: ctx.run.id
                 });
             } catch (error) {
-                logger.warn('Cloudinary upload failed, falling back to original URL', {
-                    error: String(error),
-                    runId: ctx.run.id
-                });
+                logger.warn(
+                    'Cloudinary upload failed, falling back to original URL',
+                    {
+                        error: String(error),
+                        runId: ctx.run.id
+                    }
+                );
                 // Continue with original URL/base64 if Cloudinary fails
             }
         }
 
-                // Save the prompt and generated image to database
+        // Save the prompt and generated image to database
         try {
             if (cloudinaryUrl || imageUrl || imageBase64) {
                 // 1) Persist the prompt so we can link it to the image
@@ -133,7 +140,7 @@ export const generateContent = task({
                 // 2) Create the image linked to the prompt
                 // Prefer Cloudinary URL, fallback to original URL, then base64
                 const finalImageUrl = cloudinaryUrl || imageUrl || '';
-                
+
                 await createImage(userId, {
                     url: finalImageUrl,
                     base64: cloudinaryUrl ? undefined : imageBase64, // Only store base64 if not uploaded to Cloudinary
@@ -141,8 +148,8 @@ export const generateContent = task({
                     size: size ?? undefined,
                     promptId: prompt.id
                 });
-                
-                logger.log('Image saved to database', { 
+
+                logger.log('Image saved to database', {
                     runId: ctx.run.id,
                     useCloudinary: !!cloudinaryUrl,
                     url: finalImageUrl
