@@ -5,8 +5,13 @@ import type { generateContent } from '../../../trigger/generateContent';
 import type { Route } from './+types/dalle';
 import type { ImageGenerateParamsBase } from 'openai/resources/images.mjs';
 import { getCredits, deductCredits } from '~/models/credit.server';
-import { requireUser } from '~/lib/session.server';
+import { requireUser } from '~/models/session.server';
 import { cacheUtils } from '~/cache';
+import {
+    ERROR_MESSAGES,
+    ERROR_CODES,
+    IMAGE_GENERATION_DEFAULTS
+} from '~/constants';
 
 export async function action({ request }: Route.ActionArgs) {
     if (request.method === 'POST') {
@@ -22,12 +27,12 @@ export async function action({ request }: Route.ActionArgs) {
         try {
             // Check if user has enough credits
             const currentCredits = await getCredits(user.id);
-            if (currentCredits < 1) {
+            if (currentCredits < IMAGE_GENERATION_DEFAULTS.COST_PER_IMAGE) {
                 return Response.json(
                     {
                         error: {
-                            message: 'Insufficient credits to generate image',
-                            code: 'NO_CREDITS'
+                            message: ERROR_MESSAGES.CREDITS_INSUFFICIENT,
+                            code: ERROR_CODES.NO_CREDITS
                         }
                     },
                     { status: 402 }
@@ -35,7 +40,10 @@ export async function action({ request }: Route.ActionArgs) {
             }
 
             // Deduct credits before triggering the task
-            await deductCredits(user.id, 1);
+            await deductCredits(
+                user.id,
+                IMAGE_GENERATION_DEFAULTS.COST_PER_IMAGE
+            );
 
             // Clear library cache since new image will be added
             cacheUtils.invalidateLibrary(user.id);
@@ -58,8 +66,10 @@ export async function action({ request }: Route.ActionArgs) {
         } catch (err: any) {
             return Response.json({
                 error: {
-                    message: err?.message ?? 'Failed to start run',
-                    code: err?.code ?? 'TRIGGER_ERROR'
+                    message:
+                        err?.message ??
+                        ERROR_MESSAGES.IMAGE_GENERATION_TASK_ERROR,
+                    code: err?.code ?? ERROR_CODES.TRIGGER_ERROR
                 }
             });
         }

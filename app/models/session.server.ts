@@ -1,5 +1,5 @@
 import { redirect } from 'react-router';
-import { auth } from './auth.server';
+import { auth } from '../lib/auth.server';
 
 export async function requireUser(request: Request) {
     const session = await auth.api.getSession({
@@ -7,7 +7,7 @@ export async function requireUser(request: Request) {
     });
 
     if (!session) {
-        throw redirect('/auth/sign-in');
+        throw redirect('/sign-in');
     }
 
     return session.user;
@@ -19,6 +19,11 @@ export async function getUser(request: Request) {
     });
 
     return session?.user || null;
+}
+
+export async function getUserId(request: Request) {
+    const user = await getUser(request);
+    return user?.id || null;
 }
 
 export async function requireAnonymous(request: Request) {

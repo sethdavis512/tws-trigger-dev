@@ -13,7 +13,32 @@ export const THEMES = [
     'Nursery',
     'Laundry room',
     'Basement media room',
-    'Sunroom'
+    'Sunroom',
+    'Walk-in closet',
+    'Master suite',
+    'Guest bedroom',
+    'Library study',
+    'Art studio',
+    'Music room',
+    'Wine cellar',
+    'Game room',
+    'Greenhouse',
+    'Mudroom',
+    'Powder room',
+    'Breakfast nook',
+    'Reading corner',
+    'Yoga studio',
+    'Craft room',
+    'Pantry',
+    'Attic loft',
+    'Screened porch',
+    'Pool house',
+    'Garden shed',
+    'Meditation room',
+    'Home theater',
+    'Workshop garage',
+    'Rooftop terrace',
+    'Coffee station'
 ];
 
 export const DESCRIPTIONS = [

@@ -1,9 +1,10 @@
 import { prisma } from '../db.server';
+import { USER_DEFAULTS } from '~/constants';
 import type { User } from '@prisma/client';
 
 function clampCredits(n: number | undefined): number {
-    if (!Number.isFinite(n)) return 0;
-    return Math.max(0, Math.floor(n as number));
+    if (!Number.isFinite(n)) return USER_DEFAULTS.MIN_CREDITS;
+    return Math.max(USER_DEFAULTS.MIN_CREDITS, Math.floor(n as number));
 }
 
 async function ensureUser(
@@ -16,9 +17,15 @@ async function ensureUser(
     return await prisma.user.create({
         data: {
             id: userId,
-            name: defaults?.name ?? `User ${userId}`,
-            email: defaults?.email ?? `${userId}@example.com`,
-            credits: clampCredits(defaults?.credits ?? 0)
+            name:
+                defaults?.name ??
+                `${USER_DEFAULTS.DEFAULT_NAME_PREFIX} ${userId}`,
+            email:
+                defaults?.email ??
+                `${userId}${USER_DEFAULTS.DEFAULT_EMAIL_DOMAIN}`,
+            credits: clampCredits(
+                defaults?.credits ?? USER_DEFAULTS.INITIAL_CREDITS
+            )
         }
     });
 }

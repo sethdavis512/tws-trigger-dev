@@ -1,58 +1,62 @@
-import { Form, Link } from 'react-router';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+
 import { authClient } from '~/lib/auth.client';
-import { requireAnonymous } from '~/lib/session.server';
-import type { Route } from './+types/sign-in';
+import { BRAND } from '~/constants';
+import { signInSchema, type SignInInput } from '~/validations/auth';
 
-export async function loader({ request }: Route.LoaderArgs) {
-    await requireAnonymous(request);
-    return {};
-}
+export default function SignIn() {
+    const navigate = useNavigate();
+    const [form, setForm] = useState<SignInInput>({ email: '', password: '' });
+    const [errors, setErrors] = useState<
+        Partial<Record<keyof SignInInput, string>>
+    >({});
+    const [isLoading, setIsLoading] = useState(false);
 
-export async function action({ request }: Route.ActionArgs) {
-    const formData = await request.formData();
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setErrors({});
+        const parsed = signInSchema.safeParse(form);
+        if (!parsed.success) {
+            const fieldErrors: Partial<Record<keyof SignInInput, string>> = {};
+            for (const issue of parsed.error.issues) {
+                const key = issue.path[0] as keyof SignInInput;
+                fieldErrors[key] ||= issue.message;
+            }
+            setErrors(fieldErrors);
+            return;
+        }
 
-    if (!email || !password) {
-        return {
-            error: 'Email and password are required'
-        };
-    }
+        setIsLoading(true);
+        try {
+            await authClient.signIn.email(
+                { email: form.email, password: form.password },
+                {
+                    onError: (ctx) => {
+                        const msg =
+                            (ctx as any)?.error?.message ?? 'Sign in failed';
+                        setErrors({ password: String(msg) });
+                    }
+                }
+            );
+            navigate('/');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    try {
-        await authClient.signIn.email({
-            email,
-            password
-        });
-
-        // BetterAuth will handle the redirect after successful sign-in
-        return { success: true };
-    } catch (error) {
-        return {
-            error: 'Invalid email or password'
-        };
-    }
-}
-
-export default function SignIn({ actionData }: Route.ComponentProps) {
     return (
         <div className="col-span-10 min-h-screen flex items-center justify-center py-12 px-4">
             <div className="max-w-md w-full space-y-8">
                 <div>
                     <h1 className="text-center text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-2">
-                        RapiDall•E
+                        {BRAND.NAME}
                     </h1>
                     <h2 className="text-center text-xl font-semibold text-gray-700 dark:text-gray-300">
                         Sign in to your account
                     </h2>
                 </div>
-                <Form method="post" className="mt-8 space-y-6">
-                    {actionData?.error && (
-                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded">
-                            {actionData.error}
-                        </div>
-                    )}
-
+                <form className="mt-8 space-y-6" onSubmit={onSubmit}>
                     <div className="rounded-md shadow-sm space-y-4">
                         <div>
                             <label
@@ -69,7 +73,20 @@ export default function SignIn({ actionData }: Route.ComponentProps) {
                                 required
                                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Enter your email"
+                                value={form.email}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        email: e.target.value
+                                    }))
+                                }
+                                disabled={isLoading}
                             />
+                            {errors.email ? (
+                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                    {errors.email}
+                                </p>
+                            ) : null}
                         </div>
                         <div>
                             <label
@@ -86,7 +103,20 @@ export default function SignIn({ actionData }: Route.ComponentProps) {
                                 required
                                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Enter your password"
+                                value={form.password}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        password: e.target.value
+                                    }))
+                                }
+                                disabled={isLoading}
                             />
+                            {errors.password ? (
+                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                    {errors.password}
+                                </p>
+                            ) : null}
                         </div>
                     </div>
 
@@ -94,6 +124,7 @@ export default function SignIn({ actionData }: Route.ComponentProps) {
                         <button
                             type="submit"
                             className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900"
+                            disabled={isLoading}
                         >
                             Sign in
                         </button>
@@ -107,7 +138,7 @@ export default function SignIn({ actionData }: Route.ComponentProps) {
                             Don't have an account? Sign up
                         </Link>
                     </div>
-                </Form>
+                </form>
             </div>
         </div>
     );

@@ -2,6 +2,7 @@ import { task, logger } from '@trigger.dev/sdk/v3';
 import OpenAI from 'openai';
 import type { ImageGenerateParamsBase } from 'openai/resources/images.mjs';
 import { createImage } from '~/models/image.server';
+import { createPrompt } from '~/models/prompt.server';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -77,14 +78,22 @@ export const generateContent = task({
             hasBase64: !!imageBase64
         });
 
-        // Save the generated image to database
+        // Save the prompt and generated image to database
         try {
             if (imageUrl || imageBase64) {
+                // 1) Persist the prompt so we can link it to the image
+                const prompt = await createPrompt(userId, {
+                    theme,
+                    description
+                });
+
+                // 2) Create the image linked to the prompt
                 await createImage(userId, {
                     url: imageUrl ?? '',
                     base64: imageBase64,
                     runId: ctx.run.id,
-                    size: size ?? undefined
+                    size: size ?? undefined,
+                    promptId: prompt.id
                 });
                 logger.log('Image saved to database', { runId: ctx.run.id });
             }

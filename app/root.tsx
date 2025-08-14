@@ -10,7 +10,7 @@ import {
 } from 'react-router';
 
 import type { Route } from './+types/root';
-import { getUser } from '~/lib/session.server';
+import { getUser } from '~/models/session.server';
 import { UserMenu } from '~/components/UserMenu';
 import './app.css';
 
@@ -63,14 +63,12 @@ export default function App({ loaderData }: Route.ComponentProps) {
                 <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6">
                     <aside className="space-y-3 md:col-span-2 px-4">
                         <div className="flex flex-col">
-                            <div className="flex items-center justify-between mb-4">
-                                <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-                                    RapiDall•E
-                                </h1>
-                                {loaderData.user && (
-                                    <UserMenu user={loaderData.user} />
-                                )}
-                            </div>
+                            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                                RapiDall•E
+                            </h1>
+                            {loaderData.user && (
+                                <UserMenu user={loaderData.user} />
+                            )}
 
                             {!loaderData.user && (
                                 <div className="flex flex-col space-y-2 mb-6">
@@ -89,64 +87,6 @@ export default function App({ loaderData }: Route.ComponentProps) {
                                 </div>
                             )}
                         </div>
-
-                        {loaderData.user && (
-                            <nav className="my-8">
-                                <ul className="flex flex-col items-start gap-4 text-sm">
-                                    <li>
-                                        <NavLink
-                                            to="/"
-                                            className={({ isActive }) =>
-                                                isActive
-                                                    ? 'font-bold text-amber-500'
-                                                    : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                                            }
-                                        >
-                                            Home
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink
-                                            to="/library"
-                                            className={({ isActive }) =>
-                                                isActive
-                                                    ? 'font-bold text-amber-500'
-                                                    : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                                            }
-                                        >
-                                            Library
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink
-                                            to="/runs"
-                                            className={({ isActive }) =>
-                                                isActive
-                                                    ? 'font-bold text-amber-500'
-                                                    : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                                            }
-                                        >
-                                            Runs
-                                        </NavLink>
-                                    </li>
-                                </ul>
-                            </nav>
-                        )}
-
-                        {!loaderData.user && (
-                            <div className="my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                    Sign in to start generating AI images with
-                                    DALL-E 3
-                                </p>
-                                <Link
-                                    to="/auth/sign-up"
-                                    className="block w-full bg-indigo-600 text-white text-center px-4 py-2 rounded hover:bg-indigo-700"
-                                >
-                                    Get Started
-                                </Link>
-                            </div>
-                        )}
                     </aside>
                     <Outlet />
                 </div>

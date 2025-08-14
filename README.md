@@ -64,7 +64,7 @@ A modern, full-stack AI-powered image generation platform built with React Route
    ```bash
    cp .env.example .env
    ```
-   
+
    Fill in your environment variables:
 
    ```env
@@ -140,6 +140,7 @@ The app uses **BetterAuth** with email/password authentication:
 6. **Gallery display** shows generated images in responsive grid
 
 ### Key Generation Files
+
 - `trigger/generateContent.ts` - Main generation task
 - `app/routes/api/dalle.ts` - Generation API endpoint
 - `app/components/PromptCard.tsx` - Generation interface
@@ -148,12 +149,14 @@ The app uses **BetterAuth** with email/password authentication:
 ## 🗄️ Database Schema
 
 ### Core Models
+
 - **User** - Authentication and credits management
 - **Prompt** - Reusable generation prompts
 - **Image** - Generated images with metadata
 - **Auth Tables** - Account, Session, Verification for BetterAuth
 
 ### Key Features
+
 - **Cascading deletes** for data integrity
 - **Credit system** with atomic operations
 - **Relationship mapping** between users, prompts, and images
@@ -161,7 +164,9 @@ The app uses **BetterAuth** with email/password authentication:
 ## 🚀 Deployment
 
 ### Environment Setup
+
 Ensure these environment variables are set:
+
 ```env
 DATABASE_URL=your_production_postgres_url
 OPENAI_API_KEY=your_openai_key
@@ -169,12 +174,14 @@ TRIGGER_SECRET_KEY=your_trigger_key
 ```
 
 ### Build for Production
+
 ```bash
 npm run build
 npm run start
 ```
 
 ### Docker Deployment
+
 ```bash
 docker build -t rapidalle .
 docker run -p 3000:3000 rapidalle
@@ -196,18 +203,21 @@ npx prisma migrate dev    # Apply database migrations
 ## 🎯 Key Features Deep Dive
 
 ### Credit System
+
 - Users start with 10 free credits
 - Each image generation costs 1 credit
 - Atomic credit deduction prevents race conditions
 - Extensible for future payment integration
 
 ### Real-time Monitoring
+
 - Live task status updates via Trigger.dev hooks
 - Progress indicators during generation
 - Error handling and retry logic
 - No polling - efficient WebSocket connections
 
 ### Dark Mode
+
 - System preference detection
 - Comprehensive component coverage
 - Smooth transitions and proper contrast ratios

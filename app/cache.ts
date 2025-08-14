@@ -15,7 +15,7 @@ export const getCacheKey = {
 // Cache utilities
 export const cacheUtils = {
     invalidateLibrary: (userId: string) => {
-        cache.delete(getCacheKey.library(userId));
+        cache.removeKey(getCacheKey.library(userId));
         cache.save();
     },
 
