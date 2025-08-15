@@ -177,7 +177,7 @@ function generateTextPrompt(
     description: string,
     size: ImageGenerateParamsBase['size']
 ) {
-    return `Theme: ${theme}\n\nDescription: ${description}\n\nSize: ${size}`;
+    return `Design Category: ${theme}\n\nArtistic Style: ${description}\n\nCanvas Size: ${size}`;
 }
 
 function generateImagePrompt(
@@ -185,24 +185,26 @@ function generateImagePrompt(
     description: string,
     size: ImageGenerateParamsBase['size']
 ) {
-    return `Create a photorealistic, production-quality image based on the theme and description below.
+    return `Create a high-quality artistic typography or design piece based on the theme and style description below.
 
 Hard constraints (must follow):
-- Never render text, letters, numbers, logos, watermarks, UI, borders, or frames.
-- Maintain coherent perspective and scale; no distortions, extra limbs, or artifacts.
-- Avoid extreme cropping; keep the main subject fully visible.
+- Focus on typography, lettering, text composition, or graphic design elements as the primary subject.
+- Maintain clear readability if text is present; avoid distorted or illegible letterforms.
+- Use proper typographic hierarchy, spacing, and composition principles.
+- Avoid photorealistic room interiors, furniture, or architectural elements.
 
-Quality & look:
-- Physically plausible materials, accurate reflections, and natural shadows (soft global illumination).
-- Balanced composition with clear subject, useful negative space, and depth (foreground/midground/background).
-- Camera feel: 35–50mm lens, subtle depth of field where appropriate; minimal wide-angle distortion.
-- Color: cohesive palette informed by the theme; avoid harsh clipping or oversaturation unless implied.
+Quality & artistic approach:
+- Professional design quality with attention to typographic details and visual harmony.
+- Balanced composition with strong focal points and effective use of negative space.
+- Cohesive color palette that supports the artistic style and mood.
+- Appropriate texture, lighting, and visual effects that enhance the design concept.
+- Contemporary design sensibilities with artistic flair and creative expression.
 
-Room type: ${theme}
+Design category: ${theme}
 
-Style: ${description}
+Artistic style: ${description}
 
 Output:
 - Size: ${size}
-- Style: photorealistic, ultra-detailed, high dynamic range`;
+- Style: artistic, design-focused, typography-centered, professionally crafted`;
 }

@@ -4,6 +4,17 @@ A modern, full-stack AI-powered image generation platform built with React Route
 
 ## ✨ Features
 
+- 🎨 **AI Typography & Art Generation** - Create stunning typography designs and artistic compositions with OpenAI's DALL-E 3
+- 🔐 **Complete Authentication** - Secure user accounts with BetterAuth
+- ⚡ **Real-time Updates** - Live task monitoring with Trigger.dev
+- 💳 **Credit System** - User-based credit management for generation limits
+- 🌙 **Dark Mode** - Comprehensive light/dark theme support
+- 📱 **Responsive Design** - Beautiful UI that works on all devices
+- 🚀 **Server-Side Rendering** - Fast, SEO-friendly React Router 7
+- 🗃️ **Type-Safe Database** - Prisma ORM with PostgreSQLA modern, full-stack AI-powered image generation platform built with React Router 7, BetterAuth, Trigger.dev, and Prisma.
+
+## ✨ Features
+
 - 🎨 **AI Image Generation** - Create stunning images with OpenAI's DALL-E 3
 - 🔐 **Complete Authentication** - Secure user accounts with BetterAuth
 - ⚡ **Real-time Updates** - Live task monitoring with Trigger.dev
@@ -32,8 +43,8 @@ A modern, full-stack AI-powered image generation platform built with React Route
 
 ### AI & APIs
 
-- **OpenAI DALL-E 3** - State-of-the-art image generation
-- **OpenAI GPT-4o** - Enhanced prompt processing and captions
+- **OpenAI DALL-E 3** - State-of-the-art typography and art generation
+- **OpenAI GPT-4o** - Enhanced prompt processing and artistic captions
 
 ## 🚀 Getting Started
 

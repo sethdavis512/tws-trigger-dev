@@ -80,8 +80,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
 export function meta() {
     return [
-        { title: 'New React Router App' },
-        { name: 'description', content: 'Welcome to React Router!' }
+        { title: 'AI Typography & Art Generator' },
+        {
+            name: 'description',
+            content:
+                'Create stunning typography designs and artistic compositions with AI-powered generation using DALL-E 3.'
+        }
     ];
 }
 
@@ -135,6 +139,393 @@ export async function clientLoader({
 // Force clientLoader to run on hydration to prime the cache
 clientLoader.hydrate = true;
 
+// LLM Add components here...
+
+interface PromptSelectorProps {
+    prompts: Array<{
+        id: string;
+        theme: string;
+        description: string;
+        userId: string;
+        createdAt: Date;
+    }>;
+    onPromptSelect: (theme: string, description: string) => void;
+}
+
+function PromptSelector({ prompts, onPromptSelect }: PromptSelectorProps) {
+    if (prompts.length === 0) return null;
+
+    return (
+        <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Reuse a saved prompt
+            </label>
+            <select
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                onChange={(e) => {
+                    const id = e.target.value;
+                    const p = prompts.find((pp) => pp.id === id);
+                    if (p) {
+                        onPromptSelect(p.theme, p.description);
+                    }
+                }}
+                defaultValue=""
+            >
+                <option value="" disabled>
+                    Select a saved prompt…
+                </option>
+                {prompts.map((p) => (
+                    <option key={p.id} value={p.id}>
+                        {p.theme} — {p.description.slice(0, 40)}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+}
+
+interface ThemeInputProps {
+    theme: string;
+    onChange: (theme: string) => void;
+    onEnhance: () => void;
+    isEnhancing: boolean;
+    hasPrompts: boolean;
+}
+
+function ThemeInput({
+    theme,
+    onChange,
+    onEnhance,
+    isEnhancing,
+    hasPrompts
+}: ThemeInputProps) {
+    return (
+        <div className={`md:col-span-2 ${!hasPrompts ? 'md:col-start-1' : ''}`}>
+            <div className="flex items-center gap-2 mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Theme
+                </label>
+                <button
+                    className="inline-flex items-center gap-1 rounded-md border border-gray-300 dark:border-gray-600 px-2 py-1 text-xs hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    onClick={onEnhance}
+                    type="button"
+                >
+                    {isEnhancing ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                        <SparklesIcon className="h-3 w-3" />
+                    )}
+                </button>
+            </div>
+            <input
+                name="theme"
+                type="text"
+                required
+                value={theme}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                placeholder="Enter a theme..."
+            />
+        </div>
+    );
+}
+
+interface DescriptionInputProps {
+    description: string;
+    onChange: (description: string) => void;
+    onEnhance: () => void;
+    isEnhancing: boolean;
+}
+
+function DescriptionInput({
+    description,
+    onChange,
+    onEnhance,
+    isEnhancing
+}: DescriptionInputProps) {
+    return (
+        <div className="md:col-span-5">
+            <div className="flex items-center gap-2 mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Description
+                </label>
+                <button
+                    className="inline-flex items-center gap-1 rounded-md border border-gray-300 dark:border-gray-600 px-2 py-1 text-xs hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    onClick={onEnhance}
+                    type="button"
+                >
+                    {isEnhancing ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                        <SparklesIcon className="h-3 w-3" />
+                    )}
+                </button>
+            </div>
+            <textarea
+                name="description"
+                required
+                value={description}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                rows={2}
+                placeholder="Describe what you want to see in the image..."
+            />
+        </div>
+    );
+}
+
+interface GenerateButtonProps {
+    isGenerating: boolean;
+}
+
+function GenerateButton({ isGenerating }: GenerateButtonProps) {
+    return (
+        <div className="md:col-span-1 flex items-end">
+            <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+                disabled={isGenerating}
+            >
+                {isGenerating ? (
+                    <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Generating
+                    </>
+                ) : (
+                    <>
+                        <Rocket className="h-4 w-4" />
+                        Generate
+                    </>
+                )}
+            </button>
+        </div>
+    );
+}
+
+interface ErrorDisplayProps {
+    submissionError?: { message?: string; code?: string };
+    combinedErrorMessage?: string;
+    realtimeError?: any;
+}
+
+function ErrorDisplay({
+    submissionError,
+    combinedErrorMessage,
+    realtimeError
+}: ErrorDisplayProps) {
+    if (!submissionError && !combinedErrorMessage && !realtimeError) {
+        return null;
+    }
+
+    return (
+        <div className="md:col-span-1 flex flex-col justify-between">
+            <div className="space-y-1">
+                {submissionError && (
+                    <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
+                        <XCircle className="h-3 w-3" />
+                        Error
+                    </div>
+                )}
+                {combinedErrorMessage && !submissionError && (
+                    <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
+                        <XCircle className="h-3 w-3" />
+                        Failed
+                    </div>
+                )}
+                {realtimeError && (
+                    <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
+                        <XCircle className="h-3 w-3" />
+                        Connection Error
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function EmptyState() {
+    return (
+        <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No images generated yet.</p>
+            <p className="text-gray-400 text-sm mt-2">
+                Generate your first image to see it here!
+            </p>
+        </div>
+    );
+}
+
+interface LoadingImageCardProps {
+    image: {
+        id: string;
+        theme: string;
+        description: string;
+        status: string;
+        runId: string;
+        previewSrc?: string;
+        caption?: string;
+    };
+}
+
+function LoadingImageCard({ image }: LoadingImageCardProps) {
+    return (
+        <div className="group rounded-lg border border-blue-200 dark:border-blue-700 overflow-hidden bg-blue-50 dark:bg-blue-900/20 hover:shadow-lg transition-all duration-200">
+            {image.previewSrc ? (
+                <Link to={`/${image.runId}/full`} className="block">
+                    <img
+                        src={image.previewSrc}
+                        alt={image.caption ?? 'Generated image'}
+                        className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
+                </Link>
+            ) : (
+                <div className="w-full aspect-square bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800/60 dark:to-blue-700/60 flex items-center justify-center animate-pulse">
+                    <div className="text-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-2" />
+                        <span className="text-sm text-blue-600 dark:text-blue-300">
+                            Generating...
+                        </span>
+                    </div>
+                </div>
+            )}
+            <div className="p-4">
+                <details className="mb-3" onClick={(e) => e.stopPropagation()}>
+                    <summary className="list-none cursor-pointer select-none">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                                    Generating
+                                </span>
+                                <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">
+                                    {image.theme}
+                                </h3>
+                            </div>
+                            <span className="ml-2 text-xs text-blue-500 dark:text-blue-400 transition-transform">
+                                ▾
+                            </span>
+                        </div>
+                    </summary>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm mt-2">
+                        {image.description}
+                    </p>
+                </details>
+                <div className="mt-2 text-xs text-blue-500 dark:text-blue-400">
+                    Status: {image.status}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+interface RegularImageCardProps {
+    image: ImageWithPrompt & {
+        id: string;
+        url?: string;
+        base64?: string;
+        size?: string;
+        createdAt: Date;
+        runId?: string;
+    };
+}
+
+function RegularImageCard({ image }: RegularImageCardProps) {
+    return (
+        <Link
+            to={`/${image.id}/full`}
+            className="group rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-200 block"
+        >
+            {image.url ? (
+                <img
+                    src={image.url}
+                    alt={image.prompt?.theme || 'Generated image'}
+                    className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+            ) : image.base64 ? (
+                <img
+                    src={`data:image/png;base64,${image.base64}`}
+                    alt={image.prompt?.theme || 'Generated image'}
+                    className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+            ) : (
+                <div className="w-full aspect-square bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                    <span className="text-gray-400">No image available</span>
+                </div>
+            )}
+
+            <div className="p-4">
+                {image.prompt && (
+                    <details
+                        className="mb-3"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <summary className="list-none cursor-pointer select-none">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                                        Prompt
+                                    </span>
+                                    <h3 className="font-semibold text-lg">
+                                        {image.prompt.theme}
+                                    </h3>
+                                </div>
+                                <span className="ml-2 text-xs text-gray-500 transition-transform">
+                                    ▾
+                                </span>
+                            </div>
+                        </summary>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-2">
+                            {image.prompt.description}
+                        </p>
+                    </details>
+                )}
+
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{image.size || 'Unknown size'}</span>
+                    <span>
+                        {new Date(image.createdAt).toLocaleDateString()}
+                    </span>
+                </div>
+
+                {image.runId && (
+                    <div className="mt-2 text-xs text-gray-400 font-mono">
+                        Run: {image.runId.slice(0, 8)}...
+                    </div>
+                )}
+            </div>
+        </Link>
+    );
+}
+
+interface ImageCardProps {
+    image: any;
+}
+
+function ImageCard({ image }: ImageCardProps) {
+    if (image.isLoading) {
+        return <LoadingImageCard image={image} />;
+    }
+    return <RegularImageCard image={image} />;
+}
+
+interface ImageGalleryProps {
+    images: any[];
+}
+
+function ImageGallery({ images }: ImageGalleryProps) {
+    if (images.length === 0) {
+        return <EmptyState />;
+    }
+
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-8">
+            {images.map((image: any) => (
+                <div key={image.id}>
+                    <ImageCard image={image} />
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export default function Home({ loaderData }: Route.ComponentProps) {
     // Type assertion for the expected data shape
     const { prompts, images } = loaderData as {
@@ -167,19 +558,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         run?.status === 'FAILED' ||
         run?.status === 'CANCELED';
 
-    // Debug logging for run status changes
-    useEffect(() => {
-        if (runId) {
-            console.log('📊 Run status update:', {
-                runId,
-                status,
-                finished,
-                runStatus: run?.status,
-                fetcherState: fetcher.state
-            });
-        }
-    }, [runId, status, finished, run?.status, fetcher.state]);
-
     // Extract any errors from submission (server action) or the run itself
     const submissionError: { message?: string; code?: string } | undefined =
         handle?.error;
@@ -190,8 +568,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         (status === 'FAILED'
             ? 'Run failed. See logs in Trigger.dev.'
             : undefined);
-
-    const caption: string | undefined = run?.output?.text ?? undefined;
 
     // Component state using useReducer
     const [state, dispatch] = useReducer(appReducer, {
@@ -343,89 +719,35 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 >
                     {/* First Row */}
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-                        {/* Reuse Saved Prompt - Takes 2 columns */}
-                        {prompts.length > 0 && (
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Reuse a saved prompt
-                                </label>
-                                <select
-                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                                    onChange={(e) => {
-                                        const id = e.target.value;
-                                        const p = prompts.find(
-                                            (pp) => pp.id === id
-                                        );
-                                        if (p) {
-                                            dispatch({
-                                                type: 'APPLY_SAVED_PROMPT',
-                                                payload: {
-                                                    theme: p.theme,
-                                                    description: p.description
-                                                }
-                                            });
-                                        }
-                                    }}
-                                    defaultValue=""
-                                >
-                                    <option value="" disabled>
-                                        Select a saved prompt…
-                                    </option>
-                                    {prompts.map((p) => (
-                                        <option key={p.id} value={p.id}>
-                                            {p.theme} —{' '}
-                                            {p.description.slice(0, 40)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
+                        <PromptSelector
+                            prompts={prompts}
+                            onPromptSelect={(theme, description) => {
+                                dispatch({
+                                    type: 'APPLY_SAVED_PROMPT',
+                                    payload: { theme, description }
+                                });
+                            }}
+                        />
 
-                        {/* Theme - Takes 2 columns */}
-                        <div
-                            className={`md:col-span-2 ${prompts.length === 0 ? 'md:col-start-1' : ''}`}
-                        >
-                            <div className="flex items-center gap-2 mb-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Theme
-                                </label>
-                                <button
-                                    className="inline-flex items-center gap-1 rounded-md border border-gray-300 dark:border-gray-600 px-2 py-1 text-xs hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                                    onClick={() => {
-                                        themeFetcher.submit(
-                                            {
-                                                content: `Enhance this theme: ${state.theme}. Keep it brief. Max 5 words. No punctuation.`
-                                            },
-                                            {
-                                                method: 'POST',
-                                                action: '/api/completion'
-                                            }
-                                        );
-                                    }}
-                                    type="button"
-                                >
-                                    {themeFetcher.state !== 'idle' ? (
-                                        <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                        <SparklesIcon className="h-3 w-3" />
-                                    )}
-                                </button>
-                            </div>
-                            <input
-                                name="theme"
-                                type="text"
-                                required
-                                value={state.theme}
-                                onChange={(e) =>
-                                    dispatch({
-                                        type: 'SET_THEME',
-                                        payload: e.target.value
-                                    })
-                                }
-                                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                                placeholder="Enter a theme..."
-                            />
-                        </div>
+                        <ThemeInput
+                            theme={state.theme}
+                            onChange={(theme) =>
+                                dispatch({ type: 'SET_THEME', payload: theme })
+                            }
+                            onEnhance={() => {
+                                themeFetcher.submit(
+                                    {
+                                        content: `Enhance this theme: ${state.theme}. Keep it brief. Max 5 words. No punctuation.`
+                                    },
+                                    {
+                                        method: 'POST',
+                                        action: '/api/completion'
+                                    }
+                                );
+                            }}
+                            isEnhancing={themeFetcher.state !== 'idle'}
+                            hasPrompts={prompts.length > 0}
+                        />
 
                         {/* Size - Takes 1 column */}
                         <div className="md:col-span-1">
@@ -447,263 +769,45 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                             </select>
                         </div>
 
-                        {/* Generate Button - Takes 1 column */}
-                        <div className="md:col-span-1 flex items-end">
-                            <button
-                                type="submit"
-                                className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
-                                disabled={fetcher.state !== 'idle'}
-                            >
-                                {fetcher.state !== 'idle' ? (
-                                    <>
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        Generating
-                                    </>
-                                ) : (
-                                    <>
-                                        <Rocket className="h-4 w-4" />
-                                        Generate
-                                    </>
-                                )}
-                            </button>
-                        </div>
+                        <GenerateButton
+                            isGenerating={fetcher.state !== 'idle'}
+                        />
                     </div>
 
                     {/* Second Row */}
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-                        {/* Description - Takes 5 columns */}
-                        <div className="md:col-span-5">
-                            <div className="flex items-center gap-2 mb-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Description
-                                </label>
-                                <button
-                                    className="inline-flex items-center gap-1 rounded-md border border-gray-300 dark:border-gray-600 px-2 py-1 text-xs hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                                    onClick={() => {
-                                        descriptionFetcher.submit(
-                                            {
-                                                content: `Enhance this description: ${state.description}`
-                                            },
-                                            {
-                                                method: 'POST',
-                                                action: '/api/completion'
-                                            }
-                                        );
-                                    }}
-                                    type="button"
-                                >
-                                    {descriptionFetcher.state !== 'idle' ? (
-                                        <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                        <SparklesIcon className="h-3 w-3" />
-                                    )}
-                                </button>
-                            </div>
-                            <textarea
-                                name="description"
-                                required
-                                value={state.description}
-                                onChange={(e) =>
-                                    dispatch({
-                                        type: 'SET_DESCRIPTION',
-                                        payload: e.target.value
-                                    })
-                                }
-                                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
-                                rows={2}
-                                placeholder="Describe what you want to see in the image..."
-                            />
-                        </div>
+                        <DescriptionInput
+                            description={state.description}
+                            onChange={(description) =>
+                                dispatch({
+                                    type: 'SET_DESCRIPTION',
+                                    payload: description
+                                })
+                            }
+                            onEnhance={() => {
+                                descriptionFetcher.submit(
+                                    {
+                                        content: `Enhance this description: ${state.description}`
+                                    },
+                                    {
+                                        method: 'POST',
+                                        action: '/api/completion'
+                                    }
+                                );
+                            }}
+                            isEnhancing={descriptionFetcher.state !== 'idle'}
+                        />
 
-                        {/* Status & Info - Takes 1 column */}
-                        <div className="md:col-span-1 flex flex-col justify-between">
-                            {(submissionError ||
-                                combinedErrorMessage ||
-                                realtimeError) && (
-                                <div className="space-y-1">
-                                    {submissionError && (
-                                        <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
-                                            <XCircle className="h-3 w-3" />
-                                            Error
-                                        </div>
-                                    )}
-                                    {combinedErrorMessage &&
-                                        !submissionError && (
-                                            <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
-                                                <XCircle className="h-3 w-3" />
-                                                Failed
-                                            </div>
-                                        )}
-                                    {realtimeError && (
-                                        <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
-                                            <XCircle className="h-3 w-3" />
-                                            Connection Error
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                        <ErrorDisplay
+                            submissionError={submissionError}
+                            combinedErrorMessage={combinedErrorMessage}
+                            realtimeError={realtimeError}
+                        />
                     </div>
                 </fetcher.Form>
             </div>
 
-            {allImages.length === 0 ? (
-                <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">
-                        No images generated yet.
-                    </p>
-                    <p className="text-gray-400 text-sm mt-2">
-                        Generate your first image to see it here!
-                    </p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-8">
-                    {allImages.map((image: any) => (
-                        <div key={image.id}>
-                            {image.isLoading ? (
-                                // Loading image card
-                                <div className="group rounded-lg border border-blue-200 dark:border-blue-700 overflow-hidden bg-blue-50 dark:bg-blue-900/20 hover:shadow-lg transition-all duration-200">
-                                    {image.previewSrc ? (
-                                        <Link
-                                            to={`/${image.runId}/full`}
-                                            className="block"
-                                        >
-                                            <img
-                                                src={image.previewSrc}
-                                                alt={
-                                                    image.caption ??
-                                                    'Generated image'
-                                                }
-                                                className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
-                                            />
-                                        </Link>
-                                    ) : (
-                                        <div className="w-full aspect-square bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800/60 dark:to-blue-700/60 flex items-center justify-center animate-pulse">
-                                            <div className="text-center">
-                                                <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-2" />
-                                                <span className="text-sm text-blue-600 dark:text-blue-300">
-                                                    Generating...
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )}
-                                    <div className="p-4">
-                                        <details
-                                            className="mb-3"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <summary className="list-none cursor-pointer select-none">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                                                            Generating
-                                                        </span>
-                                                        <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">
-                                                            {image.theme}
-                                                        </h3>
-                                                    </div>
-                                                    <span className="ml-2 text-xs text-blue-500 dark:text-blue-400 transition-transform">
-                                                        ▾
-                                                    </span>
-                                                </div>
-                                            </summary>
-                                            <p className="text-blue-700 dark:text-blue-300 text-sm mt-2">
-                                                {image.description}
-                                            </p>
-                                        </details>
-                                        <div className="mt-2 text-xs text-blue-500 dark:text-blue-400">
-                                            Status: {image.status}
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                // Regular image card
-                                <Link
-                                    to={`/${image.id}/full`}
-                                    className="group rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-200 block"
-                                >
-                                    {image.url ? (
-                                        <img
-                                            src={image.url}
-                                            alt={
-                                                image.prompt?.theme ||
-                                                'Generated image'
-                                            }
-                                            className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
-                                        />
-                                    ) : image.base64 ? (
-                                        <img
-                                            src={`data:image/png;base64,${image.base64}`}
-                                            alt={
-                                                image.prompt?.theme ||
-                                                'Generated image'
-                                            }
-                                            className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
-                                        />
-                                    ) : (
-                                        <div className="w-full aspect-square bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                            <span className="text-gray-400">
-                                                No image available
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    <div className="p-4">
-                                        {image.prompt && (
-                                            <details
-                                                className="mb-3"
-                                                onClick={(e) =>
-                                                    e.stopPropagation()
-                                                }
-                                            >
-                                                <summary className="list-none cursor-pointer select-none">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-                                                                Prompt
-                                                            </span>
-                                                            <h3 className="font-semibold text-lg">
-                                                                {
-                                                                    image.prompt
-                                                                        .theme
-                                                                }
-                                                            </h3>
-                                                        </div>
-                                                        <span className="ml-2 text-xs text-gray-500 transition-transform">
-                                                            ▾
-                                                        </span>
-                                                    </div>
-                                                </summary>
-                                                <p className="text-gray-600 dark:text-gray-300 text-sm mt-2">
-                                                    {image.prompt.description}
-                                                </p>
-                                            </details>
-                                        )}
-
-                                        <div className="flex items-center justify-between text-xs text-gray-500">
-                                            <span>
-                                                {image.size || 'Unknown size'}
-                                            </span>
-                                            <span>
-                                                {new Date(
-                                                    image.createdAt
-                                                ).toLocaleDateString()}
-                                            </span>
-                                        </div>
-
-                                        {image.runId && (
-                                            <div className="mt-2 text-xs text-gray-400 font-mono">
-                                                Run: {image.runId.slice(0, 8)}
-                                                ...
-                                            </div>
-                                        )}
-                                    </div>
-                                </Link>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}
+            <ImageGallery images={allImages} />
         </div>
     );
 }
