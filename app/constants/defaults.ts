@@ -41,6 +41,17 @@ export const IMAGE_GENERATION_DEFAULTS = {
     RANDOMIZE_RETRY: true
 } as const;
 
+export const RATE_LIMITS = {
+    // Free user limits
+    FREE_USER_HOURLY: 5,
+
+    // Premium user limits (for future implementation)
+    PREMIUM_USER_HOURLY: 50,
+
+    // Rate limit window duration
+    WINDOW_DURATION_MS: 60 * 60 * 1000 // 1 hour in milliseconds
+} as const;
+
 export const TRIGGER_DEFAULTS = {
     // Task configuration
     MAX_DURATION: 2 * 60 * 60, // 2 hours in seconds

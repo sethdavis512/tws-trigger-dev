@@ -35,7 +35,7 @@ export function StatusBadge({ status }: { status: string }) {
     if (status === 'EXECUTING' || status === 'QUEUED' || status === 'RUNNING') {
         return (
             <span
-                className={`${base} border-blue-600/30 bg-blue-600/10 text-blue-400`}
+                className={`${base} border-emerald-600/30 bg-emerald-600/10 text-emerald-400`}
             >
                 <Loader2 className="h-3.5 w-3.5 animate-spin" /> In progress
             </span>
@@ -43,7 +43,7 @@ export function StatusBadge({ status }: { status: string }) {
     }
     return (
         <span
-            className={`${base} border-gray-600/30 bg-gray-600/10 text-gray-300`}
+            className={`${base} border-zinc-600/30 bg-zinc-600/10 text-zinc-300`}
         >
             <Clock className="h-3.5 w-3.5" /> Idle
         </span>

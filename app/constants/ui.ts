@@ -53,13 +53,13 @@ export const Z_INDEX = {
 export const CSS_CLASSES = {
     // Common form styles
     INPUT_BASE:
-        'appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
+        'appearance-none relative block w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 placeholder-zinc-500 dark:placeholder-zinc-400 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm',
 
     BUTTON_PRIMARY:
         'group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
 
     BUTTON_SECONDARY:
-        'group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
+        'group relative w-full flex justify-center py-2 px-4 border border-zinc-300 text-sm font-medium rounded-md text-zinc-700 bg-white hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
 
     // Error styling
     ERROR_CONTAINER:
@@ -70,9 +70,9 @@ export const CSS_CLASSES = {
         'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded',
 
     // Loading states
-    SKELETON: 'animate-pulse bg-gray-200 dark:bg-gray-700 rounded',
+    SKELETON: 'animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded',
     SPINNER:
-        'animate-spin rounded-full border-2 border-gray-300 border-t-indigo-600'
+        'animate-spin rounded-full border-2 border-zinc-300 border-t-indigo-600'
 } as const;
 
 export const BRAND = {

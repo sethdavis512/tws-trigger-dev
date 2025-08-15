@@ -66,25 +66,25 @@ export default function SignUp() {
                         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400">
                             RapiDall•E
                         </h1>
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
                             AI-powered image generation
                         </p>
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-3xl font-bold text-zinc-900 dark:text-white">
                         Create your account
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                         Join the creative revolution
                     </p>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 py-8 px-6 shadow-xl rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-zinc-800 py-8 px-6 shadow-xl rounded-lg border border-emerald-200 dark:border-emerald-700">
                     <Form className="space-y-6" onSubmit={signUp}>
                         <div className="space-y-4">
                             <div>
                                 <label
                                     htmlFor="name"
-                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                                 >
                                     Full name
                                 </label>
@@ -93,7 +93,7 @@ export default function SignUp() {
                                     name="name"
                                     type="text"
                                     required
-                                    className="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm transition-colors"
+                                    className="appearance-none relative block w-full px-3 py-3 border border-emerald-300 dark:border-emerald-600 placeholder-emerald-500 dark:placeholder-emerald-400 text-emerald-900 dark:text-emerald-100 bg-white dark:bg-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-500 dark:focus:border-emerald-400 sm:text-sm transition-colors"
                                     placeholder="Enter your full name"
                                     value={form.name}
                                     onChange={(e) =>
@@ -113,7 +113,7 @@ export default function SignUp() {
                             <div>
                                 <label
                                     htmlFor="email"
-                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                                 >
                                     Email address
                                 </label>
@@ -123,7 +123,7 @@ export default function SignUp() {
                                     type="email"
                                     autoComplete="email"
                                     required
-                                    className="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm transition-colors"
+                                    className="appearance-none relative block w-full px-3 py-3 border border-zinc-300 dark:border-zinc-600 placeholder-zinc-500 dark:placeholder-zinc-400 text-zinc-900 dark:text-white bg-white dark:bg-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm transition-colors"
                                     placeholder="Enter your email"
                                     value={form.email}
                                     onChange={(e) =>
@@ -143,7 +143,7 @@ export default function SignUp() {
                             <div>
                                 <label
                                     htmlFor="password"
-                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                                 >
                                     Password
                                 </label>
@@ -153,7 +153,7 @@ export default function SignUp() {
                                     type="password"
                                     autoComplete="new-password"
                                     required
-                                    className="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm transition-colors"
+                                    className="appearance-none relative block w-full px-3 py-3 border border-zinc-300 dark:border-zinc-600 placeholder-zinc-500 dark:placeholder-zinc-400 text-zinc-900 dark:text-white bg-white dark:bg-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm transition-colors"
                                     placeholder="Create a password"
                                     value={form.password}
                                     onChange={(e) =>
@@ -173,7 +173,7 @@ export default function SignUp() {
                             <div>
                                 <label
                                     htmlFor="confirmPassword"
-                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                    className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                                 >
                                     Confirm Password
                                 </label>
@@ -183,7 +183,7 @@ export default function SignUp() {
                                     type="password"
                                     autoComplete="new-password"
                                     required
-                                    className="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm transition-colors"
+                                    className="appearance-none relative block w-full px-3 py-3 border border-zinc-300 dark:border-zinc-600 placeholder-zinc-500 dark:placeholder-zinc-400 text-zinc-900 dark:text-white bg-white dark:bg-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm transition-colors"
                                     placeholder="Confirm your password"
                                     value={form.confirmPassword}
                                     onChange={(e) =>

@@ -62,7 +62,7 @@ export default function FullscreenRoute({ loaderData }: Route.ComponentProps) {
                         className="max-w-full max-h-full object-contain"
                     />
                 ) : (
-                    <div className="bg-gray-700 rounded-lg p-8">
+                    <div className="bg-zinc-700 rounded-lg p-8">
                         <span className="text-white">No image available</span>
                     </div>
                 )}
@@ -93,10 +93,10 @@ export default function FullscreenRoute({ loaderData }: Route.ComponentProps) {
                         <h3 className="font-semibold text-lg mb-1">
                             {loaderData.image.prompt.theme}
                         </h3>
-                        <p className="text-sm text-gray-300 mb-2">
+                        <p className="text-sm text-zinc-300 mb-2">
                             {loaderData.image.prompt.description}
                         </p>
-                        <div className="flex justify-between text-xs text-gray-400">
+                        <div className="flex justify-between text-xs text-zinc-400">
                             <span>
                                 {loaderData.image.size || 'Unknown size'}
                             </span>

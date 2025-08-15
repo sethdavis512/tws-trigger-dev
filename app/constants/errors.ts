@@ -18,6 +18,9 @@ export const ERROR_MESSAGES = {
     IMAGE_GENERATION_NO_CONTENT: 'No content, retrying…',
     IMAGE_GENERATION_TASK_ERROR: 'Task execution failed',
 
+    // Rate limiting errors
+    RATE_LIMIT_EXCEEDED: 'Rate limit exceeded. Please try again later.',
+
     // General errors
     UNEXPECTED_ERROR: 'An unexpected error occurred',
     PAGE_NOT_FOUND: 'The requested page could not be found',
@@ -38,6 +41,9 @@ export const ERROR_CODES = {
     GENERATION_FAILED: 'GENERATION_FAILED',
     TRIGGER_ERROR: 'TRIGGER_ERROR',
 
+    // Rate limiting
+    RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+
     // General
     VALIDATION_ERROR: 'VALIDATION_ERROR',
     INTERNAL_ERROR: 'INTERNAL_ERROR',
@@ -51,6 +57,7 @@ export const HTTP_STATUS = {
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
+    TOO_MANY_REQUESTS: 429,
     INTERNAL_SERVER_ERROR: 500
 } as const;
 

@@ -139,8 +139,6 @@ export async function clientLoader({
 // Force clientLoader to run on hydration to prime the cache
 clientLoader.hydrate = true;
 
-// LLM Add components here...
-
 interface PromptSelectorProps {
     prompts: Array<{
         id: string;
@@ -156,27 +154,32 @@ function PromptSelector({ prompts, onPromptSelect }: PromptSelectorProps) {
     if (prompts.length === 0) return null;
 
     return (
-        <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="space-y-2">
+            <label className="block text-sm font-semibold text-emerald-900 dark:text-emerald-100">
                 Reuse a saved prompt
             </label>
             <select
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 onChange={(e) => {
-                    const id = e.target.value;
-                    const p = prompts.find((pp) => pp.id === id);
-                    if (p) {
-                        onPromptSelect(p.theme, p.description);
+                    const selectedPrompt = prompts.find(
+                        (p) => p.id === e.target.value
+                    );
+                    if (selectedPrompt) {
+                        onPromptSelect(
+                            selectedPrompt.theme,
+                            selectedPrompt.description
+                        );
                     }
                 }}
+                className="w-full h-10 rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 shadow-sm"
                 defaultValue=""
             >
                 <option value="" disabled>
-                    Select a saved prompt…
+                    Select a saved prompt...
                 </option>
-                {prompts.map((p) => (
-                    <option key={p.id} value={p.id}>
-                        {p.theme} — {p.description.slice(0, 40)}
+                {prompts.map((prompt) => (
+                    <option key={prompt.id} value={prompt.id}>
+                        {prompt.theme}: {prompt.description.slice(0, 50)}
+                        {prompt.description.length > 50 ? '...' : ''}
                     </option>
                 ))}
             </select>
@@ -200,21 +203,23 @@ function ThemeInput({
     hasPrompts
 }: ThemeInputProps) {
     return (
-        <div className={`md:col-span-2 ${!hasPrompts ? 'md:col-start-1' : ''}`}>
-            <div className="flex items-center gap-2 mb-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="space-y-2">
+            <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
                     Theme
                 </label>
                 <button
-                    className="inline-flex items-center gap-1 rounded-md border border-gray-300 dark:border-gray-600 px-2 py-1 text-xs hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    className="inline-flex items-center gap-1 rounded-md border border-emerald-300 dark:border-emerald-600 px-2 py-1 text-xs hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:hover:bg-emerald-900/20 bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-300 shadow-sm"
                     onClick={onEnhance}
                     type="button"
+                    disabled={isEnhancing || !theme.trim()}
                 >
                     {isEnhancing ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
                         <SparklesIcon className="h-3 w-3" />
                     )}
+                    <span>Enhance</span>
                 </button>
             </div>
             <input
@@ -223,7 +228,7 @@ function ThemeInput({
                 required
                 value={theme}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full h-10 rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 shadow-sm"
                 placeholder="Enter a theme..."
             />
         </div>
@@ -244,21 +249,23 @@ function DescriptionInput({
     isEnhancing
 }: DescriptionInputProps) {
     return (
-        <div className="md:col-span-5">
-            <div className="flex items-center gap-2 mb-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="space-y-2">
+            <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
                     Description
                 </label>
                 <button
-                    className="inline-flex items-center gap-1 rounded-md border border-gray-300 dark:border-gray-600 px-2 py-1 text-xs hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-gray-800 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    className="inline-flex items-center gap-1 rounded-md border border-emerald-300 dark:border-emerald-600 px-2 py-1 text-xs hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:hover:bg-emerald-900/20 bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-300 shadow-sm"
                     onClick={onEnhance}
                     type="button"
+                    disabled={isEnhancing || !description.trim()}
                 >
                     {isEnhancing ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
                     ) : (
                         <SparklesIcon className="h-3 w-3" />
                     )}
+                    <span>Enhance</span>
                 </button>
             </div>
             <textarea
@@ -266,7 +273,7 @@ function DescriptionInput({
                 required
                 value={description}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                className="w-full rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 resize-none shadow-sm"
                 rows={2}
                 placeholder="Describe what you want to see in the image..."
             />
@@ -276,29 +283,37 @@ function DescriptionInput({
 
 interface GenerateButtonProps {
     isGenerating: boolean;
+    isRateLimited?: boolean;
 }
 
-function GenerateButton({ isGenerating }: GenerateButtonProps) {
+function GenerateButton({ isGenerating, isRateLimited }: GenerateButtonProps) {
     return (
-        <div className="md:col-span-1 flex items-end">
-            <button
-                type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
-                disabled={isGenerating}
-            >
-                {isGenerating ? (
-                    <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Generating
-                    </>
-                ) : (
-                    <>
-                        <Rocket className="h-4 w-4" />
-                        Generate
-                    </>
-                )}
-            </button>
-        </div>
+        <button
+            type="submit"
+            className={`inline-flex items-center justify-center gap-2 rounded-lg px-8 py-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 shadow-sm ${
+                isRateLimited
+                    ? 'bg-zinc-400 cursor-not-allowed'
+                    : 'bg-emerald-600 hover:bg-emerald-700 hover:shadow-md focus:ring-emerald-500 dark:focus:ring-emerald-400 transform hover:scale-105 active:scale-95'
+            }`}
+            disabled={isGenerating || isRateLimited}
+        >
+            {isGenerating ? (
+                <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating Image...
+                </>
+            ) : isRateLimited ? (
+                <>
+                    <XCircle className="h-4 w-4" />
+                    Rate Limited
+                </>
+            ) : (
+                <>
+                    <Rocket className="h-4 w-4" />
+                    Generate Image
+                </>
+            )}
+        </button>
     );
 }
 
@@ -317,28 +332,42 @@ function ErrorDisplay({
         return null;
     }
 
+    // Handle rate limit specific error
+    const isRateLimited = submissionError?.code === 'RATE_LIMIT_EXCEEDED';
+
     return (
-        <div className="md:col-span-1 flex flex-col justify-between">
-            <div className="space-y-1">
-                {submissionError && (
-                    <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
-                        <XCircle className="h-3 w-3" />
-                        Error
-                    </div>
-                )}
-                {combinedErrorMessage && !submissionError && (
-                    <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
-                        <XCircle className="h-3 w-3" />
-                        Failed
-                    </div>
-                )}
-                {realtimeError && (
-                    <div className="inline-flex items-center gap-1 rounded-md border border-red-600/30 bg-red-600/10 px-2 py-1 text-xs text-red-400">
-                        <XCircle className="h-3 w-3" />
-                        Connection Error
-                    </div>
-                )}
-            </div>
+        <div className="flex flex-col gap-2">
+            {submissionError && (
+                <div
+                    className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${
+                        isRateLimited
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700/30 dark:bg-emerald-900/20 dark:text-emerald-400'
+                            : 'border-red-200 bg-red-50 text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400'
+                    }`}
+                >
+                    <XCircle className="h-4 w-4" />
+                    {isRateLimited ? 'Rate Limited' : 'Error'}
+                </div>
+            )}
+            {combinedErrorMessage && !submissionError && (
+                <div className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400">
+                    <XCircle className="h-4 w-4" />
+                    Failed
+                </div>
+            )}
+            {realtimeError && (
+                <div className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400">
+                    <XCircle className="h-4 w-4" />
+                    Connection Error
+                </div>
+            )}
+
+            {/* Show detailed error message for rate limiting */}
+            {isRateLimited && submissionError?.message && (
+                <div className="text-sm text-emerald-600 dark:text-emerald-400 max-w-sm break-words bg-emerald-50 dark:bg-emerald-900/10 p-2 rounded-md border border-emerald-200 dark:border-emerald-700/30">
+                    {submissionError.message}
+                </div>
+            )}
         </div>
     );
 }
@@ -346,8 +375,10 @@ function ErrorDisplay({
 function EmptyState() {
     return (
         <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No images generated yet.</p>
-            <p className="text-gray-400 text-sm mt-2">
+            <p className="text-emerald-600 dark:text-emerald-400 text-lg">
+                No images generated yet.
+            </p>
+            <p className="text-emerald-500 dark:text-emerald-500 text-sm mt-2">
                 Generate your first image to see it here!
             </p>
         </div>
@@ -368,7 +399,7 @@ interface LoadingImageCardProps {
 
 function LoadingImageCard({ image }: LoadingImageCardProps) {
     return (
-        <div className="group rounded-lg border border-blue-200 dark:border-blue-700 overflow-hidden bg-blue-50 dark:bg-blue-900/20 hover:shadow-lg transition-all duration-200">
+        <div className="group rounded-lg border border-emerald-200 dark:border-emerald-700 overflow-hidden bg-emerald-50 dark:bg-emerald-900/20 hover:shadow-lg transition-all duration-200">
             {image.previewSrc ? (
                 <Link to={`/${image.runId}/full`} className="block">
                     <img
@@ -378,10 +409,10 @@ function LoadingImageCard({ image }: LoadingImageCardProps) {
                     />
                 </Link>
             ) : (
-                <div className="w-full aspect-square bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-800/60 dark:to-blue-700/60 flex items-center justify-center animate-pulse">
+                <div className="w-full aspect-square bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-800/60 dark:to-emerald-700/60 flex items-center justify-center animate-pulse">
                     <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-2" />
-                        <span className="text-sm text-blue-600 dark:text-blue-300">
+                        <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto mb-2" />
+                        <span className="text-sm text-emerald-600 dark:text-emerald-300">
                             Generating...
                         </span>
                     </div>
@@ -391,24 +422,24 @@ function LoadingImageCard({ image }: LoadingImageCardProps) {
                 <details className="mb-3" onClick={(e) => e.stopPropagation()}>
                     <summary className="list-none cursor-pointer select-none">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                            <div className="flex flex-col items-start gap-2">
+                                <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
                                     Generating
                                 </span>
-                                <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">
+                                <h3 className="font-semibold text-lg text-emerald-900 dark:text-emerald-100">
                                     {image.theme}
                                 </h3>
                             </div>
-                            <span className="ml-2 text-xs text-blue-500 dark:text-blue-400 transition-transform">
+                            <span className="ml-2 text-xs text-emerald-500 dark:text-emerald-400 transition-transform">
                                 ▾
                             </span>
                         </div>
                     </summary>
-                    <p className="text-blue-700 dark:text-blue-300 text-sm mt-2">
+                    <p className="text-emerald-700 dark:text-emerald-300 text-sm mt-2">
                         {image.description}
                     </p>
                 </details>
-                <div className="mt-2 text-xs text-blue-500 dark:text-blue-400">
+                <div className="mt-2 text-xs text-emerald-500 dark:text-emerald-400">
                     Status: {image.status}
                 </div>
             </div>
@@ -431,7 +462,7 @@ function RegularImageCard({ image }: RegularImageCardProps) {
     return (
         <Link
             to={`/${image.id}/full`}
-            className="group rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 hover:shadow-lg transition-all duration-200 block"
+            className="group rounded-lg border border-emerald-200 dark:border-emerald-700 overflow-hidden bg-white dark:bg-zinc-800 hover:shadow-lg transition-all duration-200 block"
         >
             {image.url ? (
                 <img
@@ -446,8 +477,10 @@ function RegularImageCard({ image }: RegularImageCardProps) {
                     className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-200"
                 />
             ) : (
-                <div className="w-full aspect-square bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                    <span className="text-gray-400">No image available</span>
+                <div className="w-full aspect-square bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center">
+                    <span className="text-emerald-400 dark:text-emerald-500">
+                        No image available
+                    </span>
                 </div>
             )}
 
@@ -459,26 +492,26 @@ function RegularImageCard({ image }: RegularImageCardProps) {
                     >
                         <summary className="list-none cursor-pointer select-none">
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+                                <div className="flex flex-col items-start gap-2">
+                                    <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
                                         Prompt
                                     </span>
-                                    <h3 className="font-semibold text-lg">
+                                    <h3 className="font-semibold text-lg text-emerald-900 dark:text-emerald-100">
                                         {image.prompt.theme}
                                     </h3>
                                 </div>
-                                <span className="ml-2 text-xs text-gray-500 transition-transform">
+                                <span className="ml-2 text-xs text-emerald-500 dark:text-emerald-400 transition-transform">
                                     ▾
                                 </span>
                             </div>
                         </summary>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-2">
+                        <p className="text-emerald-600 dark:text-emerald-300 text-sm mt-2">
                             {image.prompt.description}
                         </p>
                     </details>
                 )}
 
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center justify-between text-xs text-emerald-500 dark:text-emerald-400">
                     <span>{image.size || 'Unknown size'}</span>
                     <span>
                         {new Date(image.createdAt).toLocaleDateString()}
@@ -486,7 +519,7 @@ function RegularImageCard({ image }: RegularImageCardProps) {
                 </div>
 
                 {image.runId && (
-                    <div className="mt-2 text-xs text-gray-400 font-mono">
+                    <div className="mt-2 text-xs text-emerald-400 dark:text-emerald-500 font-mono">
                         Run: {image.runId.slice(0, 8)}...
                     </div>
                 )}
@@ -568,6 +601,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         (status === 'FAILED'
             ? 'Run failed. See logs in Trigger.dev.'
             : undefined);
+
+    // Check if user is rate limited
+    const isRateLimited = submissionError?.code === 'RATE_LIMIT_EXCEEDED';
 
     // Component state using useReducer
     const [state, dispatch] = useReducer(appReducer, {
@@ -711,14 +747,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
     return (
         <div className="md:col-span-10">
-            <div className="w-full max-w-7xl mb-8">
+            <div className="w-full mb-8">
                 <fetcher.Form
                     method="POST"
                     action="/api/dalle"
-                    className="space-y-6"
+                    className="bg-white dark:bg-zinc-900 rounded-lg border border-emerald-200 dark:border-emerald-800 p-6 shadow-sm"
                 >
-                    {/* First Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+                    {/* First Row - Main Inputs */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                         <PromptSelector
                             prompts={prompts}
                             onPromptSelect={(theme, description) => {
@@ -749,33 +785,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                             hasPrompts={prompts.length > 0}
                         />
 
-                        {/* Size - Takes 1 column */}
-                        <div className="md:col-span-1">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Size
-                            </label>
-                            <select
-                                name="size"
-                                className="w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                                defaultValue="1024x1024"
-                            >
-                                <option value="256x256">256×256</option>
-                                <option value="512x512">512×512</option>
-                                <option value="1024x1024">1024×1024</option>
-                                <option value="1024x1536">1024×1536</option>
-                                <option value="1536x1024">1536×1024</option>
-                                <option value="1024x1792">1024×1792</option>
-                                <option value="1792x1024">1792×1024</option>
-                            </select>
-                        </div>
-
-                        <GenerateButton
-                            isGenerating={fetcher.state !== 'idle'}
-                        />
-                    </div>
-
-                    {/* Second Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
                         <DescriptionInput
                             description={state.description}
                             onChange={(description) =>
@@ -798,11 +807,41 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                             isEnhancing={descriptionFetcher.state !== 'idle'}
                         />
 
-                        <ErrorDisplay
-                            submissionError={submissionError}
-                            combinedErrorMessage={combinedErrorMessage}
-                            realtimeError={realtimeError}
-                        />
+                        {/* Size - Takes 1 column */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                                Size
+                            </label>
+                            <select
+                                name="size"
+                                className="w-full h-10 rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 shadow-sm"
+                                defaultValue="1024x1024"
+                            >
+                                <option value="256x256">256×256</option>
+                                <option value="512x512">512×512</option>
+                                <option value="1024x1024">1024×1024</option>
+                                <option value="1024x1536">1024×1536</option>
+                                <option value="1536x1024">1536×1024</option>
+                                <option value="1024x1792">1024×1792</option>
+                                <option value="1792x1024">1792×1024</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Second Row - Action and Status */}
+                    <div className="flex items-center justify-between pt-4 border-t border-emerald-200 dark:border-emerald-800">
+                        <div className="flex items-center gap-4">
+                            <GenerateButton
+                                isGenerating={fetcher.state !== 'idle'}
+                                isRateLimited={isRateLimited}
+                            />
+
+                            <ErrorDisplay
+                                submissionError={submissionError}
+                                combinedErrorMessage={combinedErrorMessage}
+                                realtimeError={realtimeError}
+                            />
+                        </div>
                     </div>
                 </fetcher.Form>
             </div>

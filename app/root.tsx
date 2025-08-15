@@ -39,7 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Meta />
                 <Links />
             </head>
-            <body className="h-full bg-white dark:bg-gray-900">
+            <body className="h-full bg-emerald-50 dark:bg-zinc-900">
                 {children}
                 <ScrollRestoration />
                 <Scripts />
@@ -63,7 +63,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
                 <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6">
                     <aside className="space-y-3 md:col-span-2 px-4">
                         <div className="flex flex-col">
-                            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                            <h1 className="text-2xl font-extrabold tracking-tight text-emerald-900 dark:text-emerald-100">
                                 RapiDall•E
                             </h1>
                             <div className="py-4">
@@ -75,20 +75,20 @@ export default function App({ loaderData }: Route.ComponentProps) {
                                     <div className="flex flex-col space-y-2 mb-6">
                                         <Link
                                             to="sign-in"
-                                            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                            className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-100"
                                         >
                                             Sign in
                                         </Link>
                                         <Link
                                             to="sign-up"
-                                            className="bg-indigo-600 text-white px-3 py-2 rounded text-sm hover:bg-indigo-700 text-center"
+                                            className="bg-emerald-600 text-white px-3 py-2 rounded text-sm hover:bg-emerald-700 text-center"
                                         >
                                             Sign up
                                         </Link>
                                     </div>
                                 )}
                             </div>
-                            <p className="py-4">
+                            <p className="py-4 text-emerald-700 dark:text-emerald-300">
                                 It's a portmanteau of "Rapid" and "DALL·E", a
                                 cutting-edge AI image generation tool.
                             </p>
