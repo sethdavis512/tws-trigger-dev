@@ -19,6 +19,7 @@ import { cache } from '~/cache';
 import { getImages } from '~/models/image.server';
 import type { Image } from '~/models/image.server';
 import { DESCRIPTIONS, pickRandom, THEMES } from '~/utils';
+import { SUPPORT_DEFAULTS } from '~/constants';
 
 type ImageWithPrompt = Image & { prompt: Prompt | null };
 
@@ -161,10 +162,13 @@ function PromptSelector({ prompts, onPromptSelect }: PromptSelectorProps) {
     if (prompts.length === 0) return null;
 
     return (
-        <div className="space-y-2">
-            <label className="block text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                Reuse a saved prompt
-            </label>
+        <div className="space-y-1">
+            <div className="flex items-center justify-between">
+                <label className="block text-xs font-medium text-emerald-800 dark:text-emerald-200">
+                    Reuse saved prompt
+                </label>
+                <span className="h-6 w-6" />
+            </div>
             <select
                 onChange={(e) => {
                     const selectedPrompt = prompts.find(
@@ -177,7 +181,7 @@ function PromptSelector({ prompts, onPromptSelect }: PromptSelectorProps) {
                         );
                     }
                 }}
-                className="w-full h-10 rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 shadow-sm"
+                className="w-full h-9 rounded border border-emerald-300 dark:border-emerald-600 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100"
                 defaultValue=""
             >
                 <option value="" disabled>
@@ -185,8 +189,8 @@ function PromptSelector({ prompts, onPromptSelect }: PromptSelectorProps) {
                 </option>
                 {prompts.map((prompt) => (
                     <option key={prompt.id} value={prompt.id}>
-                        {prompt.theme}: {prompt.description.slice(0, 50)}
-                        {prompt.description.length > 50 ? '...' : ''}
+                        {prompt.theme}: {prompt.description.slice(0, 40)}
+                        {prompt.description.length > 40 ? '...' : ''}
                     </option>
                 ))}
             </select>
@@ -210,21 +214,21 @@ function ThemeInput({
     hasPrompts
 }: ThemeInputProps) {
     return (
-        <div className="space-y-2">
+        <div className="space-y-1">
             <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                <label className="text-xs font-medium text-emerald-800 dark:text-emerald-200">
                     Theme
                 </label>
                 <button
-                    className="inline-flex items-center gap-1 rounded-md border border-emerald-300 dark:border-emerald-600 px-2 py-1 text-xs hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:hover:bg-emerald-900/20 bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                    className="h-6 inline-flex items-center gap-1 rounded border border-emerald-300 dark:border-emerald-600 px-1.5 py-0.5 text-xs hover:bg-emerald-50 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:hover:bg-emerald-900/20 bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-300"
                     onClick={onEnhance}
                     type="button"
                     disabled={isEnhancing || !theme.trim()}
                 >
                     {isEnhancing ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <Loader2 className="h-2.5 w-2.5 animate-spin" />
                     ) : (
-                        <SparklesIcon className="h-3 w-3" />
+                        <SparklesIcon className="h-2.5 w-2.5" />
                     )}
                     <span>Enhance</span>
                 </button>
@@ -235,7 +239,7 @@ function ThemeInput({
                 required
                 value={theme}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full h-10 rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 shadow-sm"
+                className="w-full h-9 rounded border border-emerald-300 dark:border-emerald-600 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100"
                 placeholder="Enter a theme..."
             />
         </div>
@@ -256,33 +260,32 @@ function DescriptionInput({
     isEnhancing
 }: DescriptionInputProps) {
     return (
-        <div className="space-y-2">
+        <div className="space-y-1">
             <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                <label className="text-xs font-medium text-emerald-800 dark:text-emerald-200">
                     Description
                 </label>
                 <button
-                    className="inline-flex items-center gap-1 rounded-md border border-emerald-300 dark:border-emerald-600 px-2 py-1 text-xs hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:hover:bg-emerald-900/20 bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                    className="h-6 inline-flex items-center gap-1 rounded border border-emerald-300 dark:border-emerald-600 px-1.5 py-0.5 text-xs hover:bg-emerald-50 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:hover:bg-emerald-900/20 bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-300"
                     onClick={onEnhance}
                     type="button"
                     disabled={isEnhancing || !description.trim()}
                 >
                     {isEnhancing ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <Loader2 className="h-2.5 w-2.5 animate-spin" />
                     ) : (
-                        <SparklesIcon className="h-3 w-3" />
+                        <SparklesIcon className="h-2.5 w-2.5" />
                     )}
                     <span>Enhance</span>
                 </button>
             </div>
-            <textarea
+            <input
                 name="description"
                 required
                 value={description}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 resize-none shadow-sm"
-                rows={2}
-                placeholder="Describe what you want to see in the image..."
+                className="w-full h-9 rounded border border-emerald-300 dark:border-emerald-600 px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 resize-none"
+                placeholder="Describe what you want to see..."
             />
         </div>
     );
@@ -297,26 +300,26 @@ function GenerateButton({ isGenerating, isRateLimited }: GenerateButtonProps) {
     return (
         <button
             type="submit"
-            className={`inline-flex items-center justify-center gap-2 rounded-lg px-8 py-3 text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 shadow-sm ${
+            className={`w-full h-9 inline-flex items-center justify-center gap-1.5 rounded border text-white text-xs font-medium focus:outline-none focus:ring-1 focus:ring-offset-1 transition-all duration-150 ${
                 isRateLimited
-                    ? 'bg-zinc-400 cursor-not-allowed'
-                    : 'bg-emerald-600 hover:bg-emerald-700 hover:shadow-md focus:ring-emerald-500 dark:focus:ring-emerald-400 transform hover:scale-105 active:scale-95'
+                    ? 'bg-zinc-400 cursor-not-allowed border-zinc-400'
+                    : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500 border-emerald-600'
             }`}
             disabled={isGenerating || isRateLimited}
         >
             {isGenerating ? (
                 <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating Image...
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Generating...
                 </>
             ) : isRateLimited ? (
                 <>
-                    <XCircle className="h-4 w-4" />
+                    <XCircle className="h-3 w-3" />
                     Rate Limited
                 </>
             ) : (
                 <>
-                    <Rocket className="h-4 w-4" />
+                    <Rocket className="h-3 w-3" />
                     Generate Image
                 </>
             )}
@@ -339,40 +342,138 @@ function ErrorDisplay({
         return null;
     }
 
-    // Handle rate limit specific error
+    // Handle specific error types
     const isRateLimited = submissionError?.code === 'RATE_LIMIT_EXCEEDED';
+    const isInsufficientCredits = submissionError?.code === 'NO_CREDITS';
+
+    // Determine error type and styling
+    const getErrorConfig = () => {
+        if (isRateLimited) {
+            return {
+                label: 'Rate Limited',
+                showDetails: true,
+                className:
+                    'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-700/30 dark:bg-amber-900/20 dark:text-amber-400'
+            };
+        }
+        if (isInsufficientCredits) {
+            return {
+                label: 'No Credits',
+                showDetails: true,
+                className:
+                    'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-700/30 dark:bg-blue-900/20 dark:text-blue-400'
+            };
+        }
+        return {
+            label: 'Error',
+            showDetails: false,
+            className:
+                'border-red-200 bg-red-50 text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400'
+        };
+    };
+
+    const errorConfig = getErrorConfig();
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="w-full mb-6 transition-all duration-300 ease-in-out">
+            {/* Top banner alert */}
             {submissionError && (
                 <div
-                    className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${
-                        isRateLimited
-                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700/30 dark:bg-emerald-900/20 dark:text-emerald-400'
-                            : 'border-red-200 bg-red-50 text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400'
-                    }`}
+                    className={`w-full rounded-lg border p-4 shadow-sm ${errorConfig.className}`}
                 >
-                    <XCircle className="h-4 w-4" />
-                    {isRateLimited ? 'Rate Limited' : 'Error'}
-                </div>
-            )}
-            {combinedErrorMessage && !submissionError && (
-                <div className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400">
-                    <XCircle className="h-4 w-4" />
-                    Failed
-                </div>
-            )}
-            {realtimeError && (
-                <div className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400">
-                    <XCircle className="h-4 w-4" />
-                    Connection Error
+                    <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                            <XCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                                <div className="font-semibold text-base mb-1">
+                                    {errorConfig.label}
+                                </div>
+
+                                {/* Show detailed error message for specific error types */}
+                                {errorConfig.showDetails &&
+                                    submissionError?.message && (
+                                        <div className="space-y-3">
+                                            <div className="text-sm">
+                                                {isInsufficientCredits
+                                                    ? '💳 '
+                                                    : '⏱️ '}
+                                                {submissionError.message}
+                                            </div>
+
+                                            {isInsufficientCredits && (
+                                                <div className="space-y-3">
+                                                    <div className="text-xs opacity-75 space-y-1">
+                                                        <div>
+                                                            • Each image
+                                                            generation costs 1
+                                                            credit
+                                                        </div>
+                                                        <div>
+                                                            • Credits enable
+                                                            unlimited image
+                                                            generation
+                                                        </div>
+                                                    </div>
+                                                    <a
+                                                        href={`mailto:${SUPPORT_DEFAULTS.EMAIL}?subject=${encodeURIComponent(SUPPORT_DEFAULTS.SUBJECT_CREDIT_REQUEST)}&body=${encodeURIComponent('Hi! I would like to purchase more credits for my RapiDall•E account. Please let me know the available options and pricing.')}`}
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                                                    >
+                                                        <svg
+                                                            className="w-4 h-4"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                                            />
+                                                        </svg>
+                                                        Contact Support
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* Show detailed error message for rate limiting */}
-            {isRateLimited && submissionError?.message && (
-                <div className="text-sm text-emerald-600 dark:text-emerald-400 max-w-sm break-words bg-emerald-50 dark:bg-emerald-900/10 p-2 rounded-md border border-emerald-200 dark:border-emerald-700/30">
-                    {submissionError.message}
+            {/* Fallback error displays for other error types */}
+            {combinedErrorMessage && !submissionError && (
+                <div className="w-full rounded-lg border border-red-200 bg-red-50 text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400 p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <XCircle className="h-5 w-5 flex-shrink-0" />
+                        <div>
+                            <div className="font-semibold">
+                                Generation Failed
+                            </div>
+                            <div className="text-sm mt-1">
+                                {combinedErrorMessage}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {realtimeError && (
+                <div className="w-full rounded-lg border border-red-200 bg-red-50 text-red-700 dark:border-red-700/30 dark:bg-red-900/20 dark:text-red-400 p-4 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <XCircle className="h-5 w-5 flex-shrink-0" />
+                        <div>
+                            <div className="font-semibold">
+                                Connection Error
+                            </div>
+                            <div className="text-sm mt-1">
+                                Unable to connect to the generation service.
+                                Please try again.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
@@ -438,7 +539,6 @@ function LoadingImageCard({ image }: LoadingImageCardProps) {
                     <summary className="list-none cursor-pointer select-none">
                         <div className="flex items-center justify-between">
                             <div className="flex flex-col items-start gap-2">
-                                
                                 <h3 className="font-semibold text-lg text-emerald-900 dark:text-emerald-100">
                                     {image.theme}
                                 </h3>
@@ -765,15 +865,21 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     const allImages = [...loadingImages, ...images];
 
     return (
-        <div className="md:col-span-10">
+        <>
+            {/* Top-level error banner */}
+            <ErrorDisplay
+                submissionError={submissionError}
+                combinedErrorMessage={combinedErrorMessage}
+                realtimeError={realtimeError}
+            />
+
             <div className="w-full mb-8">
                 <fetcher.Form
                     method="POST"
                     action="/api/dalle"
-                    className="bg-white dark:bg-zinc-900 rounded-lg border border-emerald-200 dark:border-emerald-800 p-6 shadow-sm"
+                    className="bg-white dark:bg-zinc-900 rounded-lg p-3 shadow-sm border border-emerald-200 dark:border-emerald-800"
                 >
-                    {/* First Row - Main Inputs */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
                         <PromptSelector
                             prompts={prompts}
                             onPromptSelect={(theme, description) => {
@@ -826,14 +932,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                             isEnhancing={descriptionFetcher.state !== 'idle'}
                         />
 
-                        {/* Size - Takes 1 column */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-emerald-900 dark:text-emerald-100">
-                                Size
-                            </label>
+                        {/* Size - Compact design */}
+                        <div className="space-y-1">
+                            <div className="flex justify-between">
+                                <label className="block text-xs font-medium text-emerald-800 dark:text-emerald-200">
+                                    Size
+                                </label>
+                                <span className="h-6 w-6" />
+                            </div>
                             <select
                                 name="size"
-                                className="w-full h-10 rounded-lg border border-emerald-300 dark:border-emerald-600 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100 shadow-sm"
+                                className="w-full h-9 rounded border border-emerald-300 dark:border-emerald-600 px-2 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-zinc-800 text-emerald-900 dark:text-emerald-100"
                                 defaultValue="1024x1024"
                             >
                                 <option value="256x256">256×256</option>
@@ -845,27 +954,16 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 <option value="1792x1024">1792×1024</option>
                             </select>
                         </div>
-                    </div>
 
-                    {/* Second Row - Action and Status */}
-                    <div className="flex items-center justify-between pt-4 border-t border-emerald-200 dark:border-emerald-800">
-                        <div className="flex items-center gap-4">
-                            <GenerateButton
-                                isGenerating={fetcher.state !== 'idle'}
-                                isRateLimited={isRateLimited}
-                            />
-
-                            <ErrorDisplay
-                                submissionError={submissionError}
-                                combinedErrorMessage={combinedErrorMessage}
-                                realtimeError={realtimeError}
-                            />
-                        </div>
+                        <GenerateButton
+                            isGenerating={fetcher.state !== 'idle'}
+                            isRateLimited={isRateLimited}
+                        />
                     </div>
                 </fetcher.Form>
             </div>
 
             <ImageGallery images={allImages} />
-        </div>
+        </>
     );
 }

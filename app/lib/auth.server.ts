@@ -25,5 +25,15 @@ export const auth = betterAuth({
                 required: false
             }
         }
+    },
+    onAPIError: {
+        throw: false, // Don't throw errors automatically
+        onError: (error, ctx) => {
+            // Log errors but don't crash the application
+            console.error('Better Auth API Error:', {
+                error: error instanceof Error ? error.message : String(error),
+                context: ctx
+            });
+        }
     }
 });

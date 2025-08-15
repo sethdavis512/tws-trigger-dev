@@ -1,17 +1,38 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { authClient } from '~/lib/auth.client';
 import { BRAND } from '~/constants';
 import { signInSchema, type SignInInput } from '~/validations/auth';
+import { requireAnonymous } from '~/models/session.server';
+import type { Route } from './+types/sign-in';
+
+export async function loader({ request }: Route.LoaderArgs) {
+    await requireAnonymous(request);
+    return null;
+}
 
 export default function SignIn() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [form, setForm] = useState<SignInInput>({ email: '', password: '' });
     const [errors, setErrors] = useState<
         Partial<Record<keyof SignInInput, string>>
     >({});
     const [isLoading, setIsLoading] = useState(false);
+
+    // Handle error messages from URL params
+    const errorParam = searchParams.get('error');
+    const getErrorMessage = () => {
+        switch (errorParam) {
+            case 'session-unavailable':
+                return 'Authentication service is temporarily unavailable. Please try again.';
+            case 'unexpected':
+                return 'An unexpected error occurred. Please try signing in again.';
+            default:
+                return null;
+        }
+    };
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -45,6 +66,8 @@ export default function SignIn() {
         }
     };
 
+    const errorMessage = getErrorMessage();
+
     return (
         <div className="col-span-10 min-h-screen flex items-center justify-center py-12 px-4">
             <div className="max-w-md w-full space-y-8">
@@ -56,6 +79,15 @@ export default function SignIn() {
                         Sign in to your account
                     </h2>
                 </div>
+
+                {errorMessage && (
+                    <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+                        <div className="text-sm text-red-800 dark:text-red-200">
+                            {errorMessage}
+                        </div>
+                    </div>
+                )}
+
                 <form className="mt-8 space-y-6" onSubmit={onSubmit}>
                     <div className="rounded-md shadow-sm space-y-4">
                         <div>

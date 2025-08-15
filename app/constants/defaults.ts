@@ -1,5 +1,12 @@
 // Default values for user accounts, credits, and application settings
 
+export const SUPPORT_DEFAULTS = {
+    // Support contact information
+    EMAIL: 'support@rapidalle.com',
+    SUBJECT_CREDIT_REQUEST: 'Credit Purchase Request',
+    SUBJECT_GENERAL: 'Support Request'
+} as const;
+
 export const USER_DEFAULTS = {
     // New user settings
     INITIAL_CREDITS: 10,

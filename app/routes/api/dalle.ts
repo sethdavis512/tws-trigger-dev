@@ -84,47 +84,6 @@ export async function action({ request }: Route.ActionArgs) {
     if (request.method === 'POST') {
         const user = await requireUser(request);
 
-        // Check rate limit before any processing
-        const rateLimitResult = checkRateLimit(user.id);
-
-        if (rateLimitResult.limited) {
-            const resetTimeMinutes = rateLimitResult.resetTime
-                ? Math.ceil(
-                      (rateLimitResult.resetTime - Date.now()) / (1000 * 60)
-                  )
-                : 60;
-
-            return data(
-                {
-                    error: {
-                        message: `Rate limit exceeded. You can generate ${RATE_LIMITS.FREE_USER_HOURLY} images per hour. Try again in ${resetTimeMinutes} minutes.`,
-                        code: 'RATE_LIMIT_EXCEEDED',
-                        resetTime: rateLimitResult.resetTime
-                    }
-                },
-                {
-                    status: 429,
-                    headers: {
-                        'X-RateLimit-Limit':
-                            RATE_LIMITS.FREE_USER_HOURLY.toString(),
-                        'X-RateLimit-Remaining': '0',
-                        'X-RateLimit-Reset':
-                            rateLimitResult.resetTime?.toString() || ''
-                    }
-                }
-            );
-        }
-
-        // Add rate limit headers to all responses
-        const rateLimitHeaders = {
-            'X-RateLimit-Limit': RATE_LIMITS.FREE_USER_HOURLY.toString(),
-            'X-RateLimit-Remaining':
-                rateLimitResult.remaining?.toString() || '0',
-            'X-RateLimit-Reset': (
-                Date.now() + RATE_LIMITS.WINDOW_DURATION_MS
-            ).toString()
-        };
-
         const formData = await request.formData();
         const theme = String(formData.get('theme') ?? '');
         const description = String(formData.get('description') ?? '');
@@ -133,19 +92,63 @@ export async function action({ request }: Route.ActionArgs) {
         ) as ImageGenerateParamsBase['size'];
 
         try {
-            // Check if user has enough credits
+            // Check credits first - this is the primary constraint users care about
             const currentCredits = await getCredits(user.id);
             if (currentCredits < IMAGE_GENERATION_DEFAULTS.COST_PER_IMAGE) {
                 return data(
                     {
                         error: {
-                            message: ERROR_MESSAGES.CREDITS_INSUFFICIENT,
-                            code: ERROR_CODES.NO_CREDITS
+                            message: `You have ${currentCredits} credits remaining. You need ${IMAGE_GENERATION_DEFAULTS.COST_PER_IMAGE} credit to generate an image. Contact support to add more credits.`,
+                            code: ERROR_CODES.NO_CREDITS,
+                            currentCredits,
+                            requiredCredits:
+                                IMAGE_GENERATION_DEFAULTS.COST_PER_IMAGE
                         }
                     },
-                    { status: 402, headers: rateLimitHeaders }
+                    { status: 402 }
                 );
             }
+
+            // Check rate limit after credits - this is a secondary protection
+            const rateLimitResult = checkRateLimit(user.id);
+
+            if (rateLimitResult.limited) {
+                const resetTimeMinutes = rateLimitResult.resetTime
+                    ? Math.ceil(
+                          (rateLimitResult.resetTime - Date.now()) / (1000 * 60)
+                      )
+                    : 60;
+
+                return data(
+                    {
+                        error: {
+                            message: `Rate limit exceeded. You can generate ${RATE_LIMITS.FREE_USER_HOURLY} images per hour. Try again in ${resetTimeMinutes} minutes.`,
+                            code: 'RATE_LIMIT_EXCEEDED',
+                            resetTime: rateLimitResult.resetTime
+                        }
+                    },
+                    {
+                        status: 429,
+                        headers: {
+                            'X-RateLimit-Limit':
+                                RATE_LIMITS.FREE_USER_HOURLY.toString(),
+                            'X-RateLimit-Remaining': '0',
+                            'X-RateLimit-Reset':
+                                rateLimitResult.resetTime?.toString() || ''
+                        }
+                    }
+                );
+            }
+
+            // Add rate limit headers to all responses
+            const rateLimitHeaders = {
+                'X-RateLimit-Limit': RATE_LIMITS.FREE_USER_HOURLY.toString(),
+                'X-RateLimit-Remaining':
+                    rateLimitResult.remaining?.toString() || '0',
+                'X-RateLimit-Reset': (
+                    Date.now() + RATE_LIMITS.WINDOW_DURATION_MS
+                ).toString()
+            };
 
             // Deduct credits before triggering the task
             await deductCredits(
@@ -181,7 +184,7 @@ export async function action({ request }: Route.ActionArgs) {
                         code: err?.code ?? ERROR_CODES.TRIGGER_ERROR
                     }
                 },
-                { headers: rateLimitHeaders }
+                { status: 500 }
             );
         }
     }

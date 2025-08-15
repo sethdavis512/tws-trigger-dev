@@ -10,7 +10,8 @@ export const ERROR_MESSAGES = {
     AUTH_ACCOUNT_CREATION_FAILED: 'Failed to create account',
 
     // Credit system errors
-    CREDITS_INSUFFICIENT: 'Insufficient credits to generate image',
+    CREDITS_INSUFFICIENT:
+        'You need 1 credit to generate an image. Contact support to add credits to your account.',
     CREDITS_INVALID_AMOUNT: 'Invalid credit amount',
 
     // Image generation errors

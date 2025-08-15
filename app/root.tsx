@@ -58,45 +58,37 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function App({ loaderData }: Route.ComponentProps) {
     return (
-        <main className="flex flex-col items-center gap-10 pt-10 pb-10 min-h-screen">
-            <section className="w-full px-4">
-                <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6">
-                    <aside className="space-y-3 md:col-span-2 px-4">
-                        <div className="flex flex-col">
-                            <h1 className="text-2xl font-extrabold tracking-tight text-emerald-900 dark:text-emerald-100">
-                                RapiDall•E
-                            </h1>
-                            <div className="py-4">
-                                {loaderData.user && (
-                                    <UserMenu user={loaderData.user} />
-                                )}
-
-                                {!loaderData.user && (
-                                    <div className="flex flex-col space-y-2 mb-6">
-                                        <Link
-                                            to="sign-in"
-                                            className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-100"
-                                        >
-                                            Sign in
-                                        </Link>
-                                        <Link
-                                            to="sign-up"
-                                            className="bg-emerald-600 text-white px-3 py-2 rounded text-sm hover:bg-emerald-700 text-center"
-                                        >
-                                            Sign up
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-                            <p className="py-4 text-emerald-700 dark:text-emerald-300">
-                                It's a portmanteau of "Rapid" and "DALL·E", a
-                                cutting-edge AI image generation tool.
-                            </p>
-                        </div>
-                    </aside>
-                    <Outlet />
+        <main className="min-h-screen px-4">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-extrabold tracking-tight text-emerald-900 dark:text-emerald-100">
+                        RapiDall•E
+                    </h1>
                 </div>
-            </section>
+                <div>
+                    <div className="py-4">
+                        {loaderData.user && <UserMenu user={loaderData.user} />}
+
+                        {!loaderData.user && (
+                            <div className="flex flex-col space-y-2 mb-6">
+                                <Link
+                                    to="sign-in"
+                                    className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-100"
+                                >
+                                    Sign in
+                                </Link>
+                                <Link
+                                    to="sign-up"
+                                    className="bg-emerald-600 text-white px-3 py-2 rounded text-sm hover:bg-emerald-700 text-center"
+                                >
+                                    Sign up
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <Outlet />
         </main>
     );
 }
@@ -105,6 +97,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     let message = 'Oops!';
     let details = 'An unexpected error occurred.';
     let stack: string | undefined;
+    let showSignIn = false;
 
     if (isRouteErrorResponse(error)) {
         message = error.status === 404 ? '404' : 'Error';
@@ -112,20 +105,75 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             error.status === 404
                 ? 'The requested page could not be found.'
                 : error.statusText || details;
+
+        // If it's a 401/403, suggest signing in
+        if (error.status === 401 || error.status === 403) {
+            showSignIn = true;
+            details = 'Authentication required. Please sign in to continue.';
+        }
     } else if (import.meta.env.DEV && error && error instanceof Error) {
         details = error.message;
         stack = error.stack;
+
+        // Check if this is a session-related error
+        if (
+            error.message.includes('session') ||
+            error.message.includes('auth')
+        ) {
+            showSignIn = true;
+            details =
+                'Authentication service encountered an error. Please try signing in again.';
+        }
     }
 
     return (
         <main className="pt-16 p-4 container mx-auto">
-            <h1>{message}</h1>
-            <p>{details}</p>
-            {stack && (
-                <pre className="w-full p-4 overflow-x-auto">
-                    <code>{stack}</code>
-                </pre>
-            )}
+            <div className="max-w-md mx-auto text-center">
+                <h1 className="text-2xl font-bold text-emerald-900 dark:text-emerald-100 mb-4">
+                    {message}
+                </h1>
+                <p className="text-emerald-700 dark:text-emerald-300 mb-6">
+                    {details}
+                </p>
+
+                {showSignIn && (
+                    <div className="space-y-3">
+                        <Link
+                            to="/sign-in"
+                            className="inline-block bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
+                        >
+                            Sign In
+                        </Link>
+                        <br />
+                        <Link
+                            to="/"
+                            className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline"
+                        >
+                            Go to Homepage
+                        </Link>
+                    </div>
+                )}
+
+                {!showSignIn && (
+                    <Link
+                        to="/"
+                        className="inline-block bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
+                    >
+                        Go Home
+                    </Link>
+                )}
+
+                {stack && (
+                    <details className="mt-8 text-left">
+                        <summary className="cursor-pointer text-sm text-emerald-600 dark:text-emerald-400">
+                            Show technical details
+                        </summary>
+                        <pre className="mt-2 p-4 bg-zinc-100 dark:bg-zinc-800 rounded overflow-x-auto text-xs">
+                            <code>{stack}</code>
+                        </pre>
+                    </details>
+                )}
+            </div>
         </main>
     );
 }

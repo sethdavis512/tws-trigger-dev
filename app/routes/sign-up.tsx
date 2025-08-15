@@ -2,6 +2,13 @@ import { Form, Link, useNavigate } from 'react-router';
 import { authClient } from '~/lib/auth.client';
 import { useCallback, useState } from 'react';
 import { signUpSchema, type SignUpInput } from '~/validations/auth';
+import { requireAnonymous } from '~/models/session.server';
+import type { Route } from './+types/sign-up';
+
+export async function loader({ request }: Route.LoaderArgs) {
+    await requireAnonymous(request);
+    return null;
+}
 
 export default function SignUp() {
     const navigate = useNavigate();
