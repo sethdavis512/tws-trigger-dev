@@ -2,8 +2,15 @@ import { data, Link, useRevalidator } from 'react-router';
 import type { Prompt } from '@prisma/client';
 import type { Route } from './+types/home';
 import { useRealtimeRun } from '@trigger.dev/react-hooks';
-import { Loader2, Rocket, SparklesIcon, XCircle } from 'lucide-react';
-import { useEffect, useMemo, useReducer, useId } from 'react';
+import {
+    ChevronDown,
+    ChevronRight,
+    Loader2,
+    Rocket,
+    SparklesIcon,
+    XCircle
+} from 'lucide-react';
+import { useEffect, useMemo, useReducer, useId, useState } from 'react';
 import { useFetcher } from 'react-router';
 
 import { getPrompts } from '~/models/prompt.server';
@@ -398,6 +405,8 @@ interface LoadingImageCardProps {
 }
 
 function LoadingImageCard({ image }: LoadingImageCardProps) {
+    const [isOpen, toggleOpen] = useReducer((s) => !s, false);
+
     return (
         <div className="group rounded-lg border border-emerald-200 dark:border-emerald-700 overflow-hidden bg-emerald-50 dark:bg-emerald-900/20 hover:shadow-lg transition-all duration-200">
             {image.previewSrc ? (
@@ -419,20 +428,26 @@ function LoadingImageCard({ image }: LoadingImageCardProps) {
                 </div>
             )}
             <div className="p-4">
-                <details className="mb-3" onClick={(e) => e.stopPropagation()}>
+                <details
+                    className="mb-3"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleOpen();
+                    }}
+                >
                     <summary className="list-none cursor-pointer select-none">
                         <div className="flex items-center justify-between">
                             <div className="flex flex-col items-start gap-2">
-                                <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                                    Generating
-                                </span>
+                                
                                 <h3 className="font-semibold text-lg text-emerald-900 dark:text-emerald-100">
                                     {image.theme}
                                 </h3>
                             </div>
-                            <span className="ml-2 text-xs text-emerald-500 dark:text-emerald-400 transition-transform">
-                                ▾
-                            </span>
+                            {isOpen ? (
+                                <ChevronRight className="ml-2 w-4 h-4 text-emerald-500 dark:text-emerald-400 transition-transform" />
+                            ) : (
+                                <ChevronDown className="ml-2 w-4 h-4 text-emerald-500 dark:text-emerald-400 transition-transform" />
+                            )}
                         </div>
                     </summary>
                     <p className="text-emerald-700 dark:text-emerald-300 text-sm mt-2">
@@ -459,6 +474,8 @@ interface RegularImageCardProps {
 }
 
 function RegularImageCard({ image }: RegularImageCardProps) {
+    const [isOpen, toggleOpen] = useReducer((s) => !s, false);
+
     return (
         <Link
             to={`/${image.id}/full`}
@@ -488,26 +505,34 @@ function RegularImageCard({ image }: RegularImageCardProps) {
                 {image.prompt && (
                     <details
                         className="mb-3"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleOpen();
+                        }}
+                        open={isOpen}
                     >
                         <summary className="list-none cursor-pointer select-none">
                             <div className="flex items-center justify-between">
                                 <div className="flex flex-col items-start gap-2">
-                                    <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                                        Prompt
-                                    </span>
                                     <h3 className="font-semibold text-lg text-emerald-900 dark:text-emerald-100">
                                         {image.prompt.theme}
                                     </h3>
                                 </div>
-                                <span className="ml-2 text-xs text-emerald-500 dark:text-emerald-400 transition-transform">
-                                    ▾
-                                </span>
+                                {isOpen ? (
+                                    <ChevronRight className="ml-2 w-4 h-4 text-emerald-500 dark:text-emerald-400 transition-transform" />
+                                ) : (
+                                    <ChevronDown className="ml-2 w-4 h-4 text-emerald-500 dark:text-emerald-400 transition-transform" />
+                                )}
                             </div>
                         </summary>
                         <p className="text-emerald-600 dark:text-emerald-300 text-sm mt-2">
                             {image.prompt.description}
                         </p>
+                        {image.runId && (
+                            <div className="mt-2 text-xs text-emerald-400 dark:text-emerald-500 font-mono">
+                                Run: {image.runId.slice(0, 8)}...
+                            </div>
+                        )}
                     </details>
                 )}
 
@@ -517,12 +542,6 @@ function RegularImageCard({ image }: RegularImageCardProps) {
                         {new Date(image.createdAt).toLocaleDateString()}
                     </span>
                 </div>
-
-                {image.runId && (
-                    <div className="mt-2 text-xs text-emerald-400 dark:text-emerald-500 font-mono">
-                        Run: {image.runId.slice(0, 8)}...
-                    </div>
-                )}
             </div>
         </Link>
     );
