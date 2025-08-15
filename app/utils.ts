@@ -1,0 +1,68 @@
+export function pickRandom(arr: any[]) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Curated typography and art categories to quickly try prompts without typing
+export const THEMES = [
+    'Logo design',
+    'Poster design',
+    'Book cover',
+    'Business card',
+    'Album artwork',
+    'Magazine layout',
+    'Display typography',
+    'Script lettering',
+    'Hand lettering',
+    'Calligraphy art',
+    'Vintage signage',
+    'Modern typography',
+    'Neon signage',
+    'Graffiti lettering',
+    'Typography portrait',
+    'Inspirational quote',
+    'Wedding invitation',
+    'Brand identity',
+    'Packaging design',
+    'Street art mural',
+    'Digital artwork',
+    'Abstract composition',
+    'Minimalist design',
+    'Retro poster',
+    'Concert poster',
+    'Food packaging',
+    'App icon design',
+    'Social media post',
+    'Newsletter header',
+    'Website banner',
+    'Typographic illustration',
+    'Editorial design',
+    'Art exhibition poster',
+    'Typography sculpture',
+    'Mixed media art'
+];
+
+export const DESCRIPTIONS = [
+    'Abstract expressionism — bold gestural brushstrokes, vibrant color fields, dynamic composition with spontaneous energy, paint texture visible, emotional intensity through color and form, large-scale canvas feel, dramatic lighting contrasts.',
+    'Art nouveau elegance — flowing organic lines, stylized floral motifs, sinuous curves, gold leaf accents, muted earth tones with jewel highlights, decorative borders, vintage poster aesthetic, soft gradient transitions.',
+    'Bauhaus modernism — geometric sans-serif typography, primary color palette, asymmetrical grid layouts, functional design philosophy, clean lines, negative space emphasis, high contrast, systematic approach to composition.',
+    'Victorian ornate — elaborate decorative flourishes, serif typefaces with detailed serifs, rich burgundy and gold palette, intricate borders and frames, classical proportions, formal hierarchy, luxurious texture details.',
+    'Swiss typography — precise grid systems, helvetica-style clean fonts, generous white space, mathematical proportions, minimal color palette, perfect alignment, systematic information design, objective clarity.',
+    'Japanese minimalism — zen-inspired simplicity, calligraphic brushstrokes, monochromatic palette with red accents, asymmetrical balance, natural textures, subtle gradients, meditative negative space, organic forms.',
+    'Psychedelic 60s — swirling letterforms, rainbow color gradients, optical illusion effects, hand-drawn organic shapes, vibrant neon colors, flowing compositions, counterculture aesthetic, mind-bending visual effects.',
+    'Industrial grunge — weathered metal textures, distressed typography, rust and concrete backgrounds, bold sans-serif fonts, muted color palette, urban decay aesthetic, high contrast shadows, raw authentic feel.',
+    'Art deco glamour — geometric patterns, metallic gold and silver accents, bold angular typography, sunburst motifs, luxury color palette, symmetrical compositions, jazz age sophistication, dramatic lighting effects.',
+    'Retro mid-century — atomic age graphics, boomerang shapes, vintage color schemes, stylized illustrations, optimistic futurism, clean geometric forms, advertising poster style, nostalgic americana vibe.',
+    'Gothic blackletter — medieval calligraphy, ornate capitals, dark atmospheric mood, parchment textures, illuminated manuscript style, rich deep colors, historical authenticity, dramatic shadows and highlights.',
+    'Constructivist revolution — bold red and black color scheme, diagonal compositions, photomontage elements, propaganda poster aesthetic, strong geometric shapes, revolutionary energy, dynamic angles and movement.',
+    'Postmodern deconstruction — experimental typography, clashing elements, vibrant color combinations, fragmented layouts, digital glitch effects, rebellious anti-design, chaotic yet intentional composition, contemporary edge.',
+    'Calligraphic elegance — flowing script letterforms, ink brush textures, graceful curves and flourishes, traditional craftsmanship, elegant proportions, sophisticated color palette, artistic spontaneity, handmade authenticity.',
+    'Neon cyberpunk — electric color palette, futuristic typography, glowing effects, chrome reflections, digital grid backgrounds, high-tech aesthetic, dark moody atmosphere with bright accents, sci-fi inspiration.',
+    'Watercolor organic — soft paint bleeding effects, natural color transitions, hand-painted textures, artistic spontaneity, flowing letterforms, gentle color palette, creative freedom, traditional art medium feel.',
+    'Minimalist modern — ultra-clean typography, maximum white space, single accent color, perfect geometric alignment, contemporary sans-serif fonts, sophisticated restraint, architectural precision, timeless elegance.',
+    'Street art urban — spray paint textures, bold graffiti style, vibrant color combinations, raw energy, hand-painted authenticity, urban decay backgrounds, rebellious attitude, contemporary street culture.',
+    'Vintage americana — nostalgic color palette, distressed textures, classic serif typography, patriotic themes, weathered sign painting style, authentic aging effects, small-town charm, historical references.',
+    'Digital futurism — holographic effects, LED-style typography, technological grid systems, electric blue and cyan palette, sleek modern forms, high-tech precision, contemporary digital aesthetic, cutting-edge design.',
+    'Hand-drawn authentic — imperfect letterforms, organic textures, human touch visible, charming irregularities, natural color variations, artistic spontaneity, craft-made feel, personal expression through imperfection.',
+    'Luxury fashion — sophisticated typography, elegant serif fonts, refined color palette, high-end aesthetic, pristine white space, fashion magazine style, aspirational mood, premium brand feeling.',
+    'Punk rock rebellion — aggressive letterforms, torn paper textures, bold black and red colors, anarchist aesthetic, DIY authenticity, raw energy, anti-establishment attitude, underground culture references.'
+];
