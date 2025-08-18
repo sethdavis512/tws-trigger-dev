@@ -46,7 +46,7 @@ export function UserMenu({ user }: UserMenuProps) {
                             </p>
                         </div>
                         <div className="p-4">
-                            <p className="text-emerald-700 dark:text-emerald-300">
+                            <p className="text-emerald-700 dark:text-emerald-300 text-xs">
                                 It's a portmanteau of "Rapid" and "DALL·E", a
                                 cutting-edge AI image generation tool.
                             </p>

@@ -1,4 +1,4 @@
-# Copilot Instructions
+# Claude Instructions
 
 ## Project Overview
 
