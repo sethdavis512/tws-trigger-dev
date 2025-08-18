@@ -9,14 +9,24 @@ datasource db {
 }
 
 model User {
-    id            String   @id @default(cuid())
-    name          String?
-    email         String   @unique
-    emailVerified Boolean  @default(false)
-    image         String?
-    credits       Int      @default(10)
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    id                String   @id @default(cuid())
+    name              String?
+    email             String   @unique
+    emailVerified     Boolean  @default(false)
+    image             String?
+    credits           Int      @default(10)
+    
+    // Polar integration fields
+    polarCustomerId   String?  @unique
+    subscriptionId    String?  @unique
+    subscriptionTier  String?  @default("free")
+    subscriptionStatus SubscriptionStatus @default(INACTIVE)
+    billingPeriodEnd  DateTime?
+    usageResetDate    DateTime?
+    monthlyCreditsUsed Int     @default(0)
+    
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
 
     // BetterAuth relationships
     accounts Account[]
@@ -24,6 +34,8 @@ model User {
 
     prompts Prompt[]
     images  Image[]
+    transactions Transaction[]
+    usageEvents  UsageEvent[]
 
     @@map("users")
 }
@@ -104,4 +116,55 @@ model Image {
     prompt   Prompt? @relation(fields: [promptId], references: [id], onDelete: SetNull)
 
     @@map("images")
+}
+
+model Transaction {
+    id           String            @id @default(cuid())
+    polarOrderId String            @unique
+    userId       String
+    type         TransactionType
+    credits      Int               // Credits granted
+    amountCents  Int               // Price paid in cents
+    currency     String            @default("USD")
+    status       TransactionStatus @default(PENDING)
+    metadata     Json?
+    createdAt    DateTime          @default(now())
+    
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    @@map("transactions")
+}
+
+model UsageEvent {
+    id        String   @id @default(cuid())
+    userId    String
+    feature   String   // "dalle_generation", "gpt_completion", etc.
+    credits   Int      // Credits consumed
+    metadata  Json?    // Additional context
+    createdAt DateTime @default(now())
+    
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    @@map("usage_events")
+}
+
+enum SubscriptionStatus {
+    ACTIVE
+    INACTIVE  
+    PAST_DUE
+    CANCELED
+    TRIALING
+}
+
+enum TransactionType {
+    CREDIT_PURCHASE
+    SUBSCRIPTION_PAYMENT
+    REFUND
+}
+
+enum TransactionStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
 }

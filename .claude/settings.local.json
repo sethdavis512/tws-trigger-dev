@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__second-brain__search_notes",
+      "WebFetch(domain:docs.polar.sh)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

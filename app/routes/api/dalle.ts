@@ -4,7 +4,7 @@ import { tasks } from '@trigger.dev/sdk/v3';
 import type { generateContent } from '../../../trigger/generateContent';
 import type { Route } from './+types/dalle';
 import type { ImageGenerateParamsBase } from 'openai/resources/images.mjs';
-import { getCredits, deductCredits } from '~/models/credit.server';
+import { getCredits, deductCreditsWithTracking } from '~/models/credit.server';
 import { requireUser } from '~/models/session.server';
 import { cacheUtils, cache } from '~/cache';
 import {
@@ -150,10 +150,12 @@ export async function action({ request }: Route.ActionArgs) {
                 ).toString()
             };
 
-            // Deduct credits before triggering the task
-            await deductCredits(
+            // Deduct credits with usage tracking before triggering the task
+            await deductCreditsWithTracking(
                 user.id,
-                IMAGE_GENERATION_DEFAULTS.COST_PER_IMAGE
+                IMAGE_GENERATION_DEFAULTS.COST_PER_IMAGE,
+                'dalle_generation',
+                { theme, description, size }
             );
 
             // Clear library cache since new image will be added
