@@ -12,7 +12,12 @@ export default [
     route('sign-out', 'routes/sign-out.tsx'),
     route('sign-up', 'routes/sign-up.tsx'),
     layout('routes/authenticated.tsx', [
-        route(':imageId/full', 'routes/fullscreen.tsx')
+        route(':imageId/full', 'routes/fullscreen.tsx'),
+        route('billing', 'routes/authenticated/billing.tsx', [
+            route('checkout', 'routes/billing/checkout.tsx'),
+            route('portal', 'routes/billing/portal.tsx'),
+            route('success', 'routes/billing/success.tsx')
+        ])
     ]),
     ...prefix('api', [
         route('dalle', 'routes/api/dalle.ts'),

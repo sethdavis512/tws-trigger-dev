@@ -69,31 +69,31 @@ export default function SignIn() {
     const errorMessage = getErrorMessage();
 
     return (
-        <div className="col-span-10 min-h-screen flex items-center justify-center py-12 px-4">
-            <div className="max-w-md w-full space-y-8">
-                <div>
-                    <h1 className="text-center text-3xl font-extrabold tracking-tight text-emerald-900 dark:text-emerald-100 mb-2">
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center py-12 px-4">
+            <div className="max-w-md w-full">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-white mb-2">
                         {BRAND.NAME}
                     </h1>
-                    <h2 className="text-center text-xl font-semibold text-emerald-700 dark:text-emerald-300">
+                    <h2 className="text-lg text-emerald-400">
                         Sign in to your account
                     </h2>
                 </div>
 
                 {errorMessage && (
-                    <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
-                        <div className="text-sm text-red-800 dark:text-red-200">
+                    <div className="rounded-md bg-red-900/20 border border-red-800 p-4 mb-6">
+                        <div className="text-sm text-red-200">
                             {errorMessage}
                         </div>
                     </div>
                 )}
 
-                <form className="mt-8 space-y-6" onSubmit={onSubmit}>
-                    <div className="rounded-md shadow-sm space-y-4">
+                <form className="space-y-6" onSubmit={onSubmit}>
+                    <div className="space-y-4">
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-sm font-medium text-emerald-700 dark:text-emerald-300 mb-1"
+                                className="block text-sm font-medium text-emerald-400 mb-2"
                             >
                                 Email address
                             </label>
@@ -103,7 +103,7 @@ export default function SignIn() {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="appearance-none relative block w-full px-3 py-2 border border-emerald-300 dark:border-emerald-600 placeholder-emerald-500 dark:placeholder-emerald-400 text-emerald-900 dark:text-emerald-100 bg-white dark:bg-zinc-800 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm"
+                                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                 placeholder="Enter your email"
                                 value={form.email}
                                 onChange={(e) =>
@@ -115,7 +115,7 @@ export default function SignIn() {
                                 disabled={isLoading}
                             />
                             {errors.email ? (
-                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                <p className="mt-2 text-sm text-red-400">
                                     {errors.email}
                                 </p>
                             ) : null}
@@ -123,7 +123,7 @@ export default function SignIn() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium text-emerald-700 dark:text-emerald-300 mb-1"
+                                className="block text-sm font-medium text-emerald-400 mb-2"
                             >
                                 Password
                             </label>
@@ -133,7 +133,7 @@ export default function SignIn() {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="appearance-none relative block w-full px-3 py-2 border border-emerald-300 dark:border-emerald-600 placeholder-emerald-500 dark:placeholder-emerald-400 text-emerald-900 dark:text-emerald-100 bg-white dark:bg-zinc-800 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm"
+                                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                 placeholder="Enter your password"
                                 value={form.password}
                                 onChange={(e) =>
@@ -145,29 +145,28 @@ export default function SignIn() {
                                 disabled={isLoading}
                             />
                             {errors.password ? (
-                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                <p className="mt-2 text-sm text-red-400">
                                     {errors.password}
                                 </p>
                             ) : null}
                         </div>
                     </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-offset-zinc-900"
-                            disabled={isLoading}
-                        >
-                            Sign in
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Signing in...' : 'Sign in'}
+                    </button>
 
-                    <div className="text-center">
+                    <div className="text-center pt-4">
+                        <span className="text-gray-400">Don't have an account? </span>
                         <Link
                             to="/sign-up"
-                            className="font-medium text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                            className="font-medium text-emerald-400 hover:text-emerald-300"
                         >
-                            Don't have an account? Sign up
+                            Sign up
                         </Link>
                     </div>
                 </form>
